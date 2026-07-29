@@ -25,6 +25,7 @@ const router = Router();
  * Request Body:
  *  - `name`: string (obligatorio)
  *  - `email`: string (obligatorio, único)
+ *  - `phoneNumber`: integer (obligatorio, unico)
  * 
  * Response:
  *  - 201 Created: Retorna el usuario creado en formato JSON.
@@ -45,6 +46,9 @@ const router = Router();
  *             required:
  *               - name
  *               - email
+ *               - phoneNumber
+ *               - password
+ *              
  *             properties:
  *               name:
  *                 type: string
@@ -52,6 +56,12 @@ const router = Router();
  *               email:
  *                 type: string
  *                 example: "john.doe@example.com"
+ *               phoneNumber:
+ *                  type: integer
+ *                  example: "123456789"
+ *               password:
+ *                  type: string
+ *                  example: "*****"   
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
@@ -61,6 +71,8 @@ const router = Router();
  *               id: 3
  *               name: "John Doe"
  *               email: "john.doe@example.com"
+ *               phoneNumber: "123456789"
+ *               password: "*****"
  *       400:
  *         description: Datos inválidos
  *         content:
@@ -99,9 +111,13 @@ router.post("/", createUser);
  *               - id: 1
  *                 name: "John Doe"
  *                 email: "john.doe@example.com"
+ *                 phoneNumber: "123456789"
+ *                 password: "*****"
  *               - id: 2
  *                 name: "Jane Doe"
  *                 email: "john.doe@example.com"
+ *                 phoneNumber: "123456789"
+ *                 password: "*****"
  *       400:
  *         description: Solicitud inválida
  *         content:

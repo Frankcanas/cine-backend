@@ -13,7 +13,7 @@
  * Este modelo es utilizado por los servicios y controladores para realizar operaciones CRUD.
  */
 
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, INTEGER, Model, Optional } from "sequelize";
 import sequelize from "../config/database";
 
 /**
@@ -23,6 +23,9 @@ export interface UserAttributes {
   id: number;
   name: string;
   email: string;
+  phoneNumber: number;
+  password: string;
+  city: string;
 }
 
 /**
@@ -47,6 +50,13 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   /** Dirección de correo electrónico única del usuario. */
   public email!: string;
+  
+  /** Numero de telefono unico del usuario */
+  public phoneNumber!: number;
+
+  public password!: string;
+
+  public city!: string;
 }
 
 /**
@@ -55,6 +65,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
  * - `id`: Entero autoincremental, clave primaria.
  * - `name`: Nombre obligatorio con máximo 100 caracteres.
  * - `email`: Correo electrónico único y obligatorio con máximo 100 caracteres.
+ * - ´number´: Numero de telefono unico y olbigatorio 
  */
 User.init(
   {
@@ -71,6 +82,19 @@ User.init(
       type: DataTypes.STRING(100),
       unique: true,
       allowNull: false,
+    },
+    phoneNumber: {
+      type: DataTypes.INTEGER,
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(150),
+      allowNull: false,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

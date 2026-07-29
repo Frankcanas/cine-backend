@@ -1,5 +1,7 @@
 // app/src/dto/create-user.dto.ts
 
+import { IntegerDataType } from "sequelize";
+
 /**
  * DTO - Creación de Usuario
  * -------------------------
@@ -18,11 +20,16 @@
  *
  * @property {string} name - Nombre completo del usuario.
  * @property {string} email - Dirección de correo electrónico única del usuario.
+ * @property {integer} phoneNumber - Numero de telenofo completo unico del usuario 
+ * @property {string} password - Contraseña
+
  *
  * @example
  * const dto: CreateUserDto = {
  *   name: "David Mtz",s
  *   email: "david@example.com"
+ *   phoneNumber: "123456789"
+ *   password: "*****"
  * };
  */
 
@@ -38,4 +45,17 @@ export interface CreateUserDto {
      */
     email: string;
 
+    /**
+     * Numero del usuario.
+     */
+    phoneNumber: IntegerDataType;
+
+        /**
+     * contraseña del usuario.
+     */
+    password: string;
+
+    city: string;
+
 }
+

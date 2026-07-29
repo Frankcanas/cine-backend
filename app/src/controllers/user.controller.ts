@@ -136,6 +136,7 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
  *     "id": 1,
  *     "name": "David",
  *     "email": "david@example.com"
+ *     "password": ******
  *   }
  * ]
  */
