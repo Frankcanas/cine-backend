@@ -10,11 +10,15 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./docs/swagger";
 
+import userRoutes from "./routes/user.routes";
+
+
 const app = express();
 
 app.use(express.json());
 
 // Rutas
+app.use("/api/users", userRoutes);
 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
