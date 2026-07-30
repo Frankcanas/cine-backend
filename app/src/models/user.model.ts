@@ -23,7 +23,7 @@ export interface UserAttributes {
   id: number;
   name: string;
   email: string;
-  phoneNumber: number;
+  phoneNumber: string;
   password: string;
   city: string;
 }
@@ -52,7 +52,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public email!: string;
   
   /** Numero de telefono unico del usuario */
-  public phoneNumber!: number;
+  public phoneNumber!: string;
 
   public password!: string;
 
@@ -84,7 +84,7 @@ User.init(
       allowNull: false,
     },
     phoneNumber: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(30),
       unique: true,
       allowNull: false,
     },

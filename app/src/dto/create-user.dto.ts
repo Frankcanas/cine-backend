@@ -20,7 +20,7 @@ import { IntegerDataType } from "sequelize";
  *
  * @property {string} name - Nombre completo del usuario.
  * @property {string} email - Dirección de correo electrónico única del usuario.
- * @property {integer} phoneNumber - Numero de telenofo completo unico del usuario 
+ * @property {string} phoneNumber - Numero de telefono completo unico del usuario 
  * @property {string} password - Contraseña
 
  *
@@ -48,7 +48,7 @@ export interface CreateUserDto {
     /**
      * Numero del usuario.
      */
-    phoneNumber: IntegerDataType;
+    phoneNumber: string;
 
         /**
      * contraseña del usuario.

@@ -57,7 +57,7 @@ const router = Router();
  *                 type: string
  *                 example: "john.doe@example.com"
  *               phoneNumber:
- *                  type: integer
+ *                  type: string
  *                  example: "123456789"
  *               password:
  *                  type: string
