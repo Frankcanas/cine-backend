@@ -48,6 +48,7 @@ const router = Router();
  *               - email
  *               - phoneNumber
  *               - password
+ *               - city
  *              
  *             properties:
  *               name:
@@ -62,6 +63,9 @@ const router = Router();
  *               password:
  *                  type: string
  *                  example: "*****"   
+ *               city:   
+ *                type: string
+ *                example: "New York"
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
@@ -73,6 +77,7 @@ const router = Router();
  *               email: "john.doe@example.com"
  *               phoneNumber: "123456789"
  *               password: "*****"
+ *               city: "New York"
  *       400:
  *         description: Datos inválidos
  *         content:
