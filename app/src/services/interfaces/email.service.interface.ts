@@ -1,0 +1,15 @@
+/**
+ * Opciones requeridas para estructurar un correo.
+ */
+export interface SendEmailDto{
+    to: string;
+    subject: string;
+    html: string;
+}
+
+/**
+ * Contrato del Servicio de Email (Infraestructura).
+ */
+export interface IEmailService {
+    send(options: SendEmailDto): Promise<void>;
+}

@@ -14,6 +14,7 @@ import userRoutes from "./routes/user.routes";
 
 import authRoutes from "./routes/auth.routes";
 
+import emailRoutes from './routes/email.routes'; 
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.use(express.json());
 // Rutas
 app.use("/api/users", userRoutes);
 app.use('/api/auth', authRoutes);
-
+app.use('/api/mail', emailRoutes); 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

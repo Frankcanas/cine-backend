@@ -27,7 +27,7 @@ services:
     image: postgres:15-alpine
     container_name: ${DB_CONTAINER_NAME}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     restart: always
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
