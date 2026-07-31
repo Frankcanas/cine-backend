@@ -34,7 +34,7 @@ export class Membership extends Model {
     durationDays!: number;
     
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(700),
         allowNull: true,
     })
     description!: string;
