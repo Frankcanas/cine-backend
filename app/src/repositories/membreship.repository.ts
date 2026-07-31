@@ -21,6 +21,13 @@ class MembershipRepository {
     async findByName(name: string): Promise<Membership | null>{
         return await Membership.findOne({ where: { name}});
     }
+
+    /**
+     * Obtiene todas las membresías de la base de datos
+     */
+    async findAll(): Promise<Membership[]> {
+        return await Membership.findAll();
+    }
 }   
 
 export default new MembershipRepository();

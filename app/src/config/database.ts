@@ -18,7 +18,11 @@
  *  - POSTGRES_PORT: Puerto de conexión (por defecto `5432`).
  */
 
-import { Sequelize } from "sequelize";
+//import { Sequelize } from "sequelize";
+
+import { Sequelize } from "sequelize-typescript";
+import Membership from "../models/membreship.model";
+
 
 /**
  * Instancia de Sequelize configurada para PostgreSQL.
@@ -33,6 +37,7 @@ const sequelize = new Sequelize(
     port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
     dialect: "postgres",
     logging: false, // Desactiva logs SQL en consola (útil en producción)
+    models: [Membership], // User se registra mediante User.init(...)
   }
 );
 

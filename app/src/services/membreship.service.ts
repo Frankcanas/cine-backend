@@ -23,5 +23,12 @@ class MembershipService {
         // se crea mediante el repositorio 
         return await membreshipRepository.create(dto)
     }
+
+    /**
+     * Retorna todas las membresías existentes
+     */
+    async getAll() {
+        return await membreshipRepository.findAll();
+    }
 }
     export default new MembershipService();
