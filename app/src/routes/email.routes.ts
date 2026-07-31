@@ -7,7 +7,7 @@ const router = Router();
  * @openapi
  * /api/mail/email:
  *   post:
- *     summary: Probar el envío de correos con Nodemailer
+ *     summary: Enviar correo a usuario registrado
  *     tags: [Mail]
  *     requestBody:
  *       required: true
@@ -16,13 +16,14 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - to
+ *               - userId
  *               - subject
  *               - html
  *             properties:
- *               to:
- *                 type: string
- *                 example: tu-correo-personal@gmail.com
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *                 description: Identificador del usuario registrado al que se enviará el correo.
  *               subject:
  *                 type: string
  *                 example: Prueba desde Swagger
@@ -32,6 +33,10 @@ const router = Router();
  *     responses:
  *       200:
  *         description: Correo enviado correctamente
+ *       400:
+ *         description: Faltan datos requeridos o formato inválido
+ *       404:
+ *         description: Usuario no encontrado
  *       500:
  *         description: Error en el servidor o credenciales SMTP inválidas
  */
