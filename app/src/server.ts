@@ -12,9 +12,9 @@ import { swaggerSpec } from "./docs/swagger";
 
 import userRoutes from "./routes/user.routes";
 import membershipRoutes from "./routes/membership.routes";
-
 import authRoutes from "./routes/auth.routes";
-
+import movieRoutes from "./routes/movie.routes";
+import showtimeRoutes from "./routes/showtime.routes";
 
 const app = express();
 
@@ -22,8 +22,10 @@ app.use(express.json());
 
 // Rutas
 app.use("/api/users", userRoutes);
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/membership", membershipRoutes);
+app.use("/api/movies", movieRoutes);
+app.use("/api/showtimes", showtimeRoutes);
 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
