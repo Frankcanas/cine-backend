@@ -31,9 +31,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API Example",
+      title: "Cine Backend API",
       version: "1.0.0",
-      description: "Documentación generada automáticamente con Swagger para la API de ejemplo.",
+      description: "Documentación generada automáticamente con Swagger para Cine Backend.",
     },
   },
   apis: ["./src/routes/*.ts"], // Escanea las rutas para extraer anotaciones Swagger

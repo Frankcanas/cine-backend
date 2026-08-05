@@ -22,6 +22,7 @@
 
 import { Sequelize } from "sequelize-typescript";
 import Membership from "../models/membreship.model";
+import Token from "../models/token.model";
 
 
 /**
@@ -33,11 +34,11 @@ const sequelize = new Sequelize(
   process.env.POSTGRES_USER as string,
   process.env.POSTGRES_PASSWORD as string,
   {
-    host: process.env.POSTGRES_HOST || "db", // En docker-compose, el servicio de la BD se llama "db"
+    host: process.env.POSTGRES_HOST || "db",
     port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
     dialect: "postgres",
-    logging: false, // Desactiva logs SQL en consola (útil en producción)
-    models: [Membership], // User se registra mediante User.init(...)
+    logging: false,
+    models: [Membership, Token], // User se registra mediante User.init(...)
   }
 );
 
