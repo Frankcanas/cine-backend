@@ -21,11 +21,19 @@
 //import { Sequelize } from "sequelize";
 
 import { Sequelize } from "sequelize-typescript";
+import User from "../models/user.model";
 import Membership from "../models/membreship.model";
 import Department from "../models/department.model";
 import City from "../models/city.model";
 import Country from "../models/country.model";
 import ApiClient from "../models/api-client.model";
+import Audit from "../models/audit.model";
+import Rol from "../models/role.model";
+import ChatHistory from "../models/chat-history.model";
+import Pqrs from "../models/pqrs.model";
+import Notification from "../models/notification.model";
+import Voucher from "../models/voucher.model";
+
 
 
 /**
@@ -41,7 +49,7 @@ const sequelize = new Sequelize(
     port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
     dialect: "postgres",
     logging: false, // Desactiva logs SQL en consola (útil en producción)
-    models: [Membership, Department, City, Country, ApiClient], // User se registra mediante User.init(...)
+    models: [Membership, Department, City, Country, ApiClient, Audit, Rol, ChatHistory, Pqrs, Notification, Voucher], // User se registra mediante User.init(...)
   }
 );
 
