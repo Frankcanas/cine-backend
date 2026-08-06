@@ -13,9 +13,16 @@ export class AuthService implements IAuthService {
   async requestVerificationToken(userId: number, email: string): Promise<void> {
     const token = crypto.randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+    const existingToken = await this.tokenRepository.findLatestTokenByUserId(userId);
 
-    await this.tokenRepository.saveToken({ userId, email, token, expiresAt });
+    if (existingToken) {
+      await this.tokenRepository.updateToken(userId, existingToken.token, { token, expiresAt });
+    } else {
+      await this.tokenRepository.saveToken({ userId, email, token, expiresAt });
+    }
+
     await this.emailService.sendVerificationEmail(email, token);
+
   }
 
   async verifyToken(userId: number, token: string): Promise<{ success: boolean; message: string }> {
