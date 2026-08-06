@@ -26,7 +26,24 @@ app.use("/api/users", userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/mail', emailRoutes); 
 app.use("/api/membership", membershipRoutes);
+<<<<<<< Updated upstream
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+=======
+app.use("/api/movies", movieRoutes);
+app.use("/api/showtimes", showtimeRoutes);
+
+// Swagger en formato JSON
+app.get("/api/docs.json", (_req, res) => {
+  res.status(200).json(swaggerSpec);
+});
+
+// Swagger visual
+app.use(
+  "/api/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
+>>>>>>> Stashed changes
 
 export default app;
