@@ -24,7 +24,7 @@ export class ChatHistory extends Model {
   })
   id!: number;
 
-  @ForeignKey(() => User as any)
+  @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,

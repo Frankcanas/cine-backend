@@ -23,6 +23,14 @@
 import { Sequelize } from "sequelize-typescript";
 import User from "../models/user.model";
 import Membership from "../models/membreship.model";
+import Movie from "../models/movie.model";
+import Cinema from "../models/cinema.model";
+import Room from "../models/room.model";
+import Showtime from "../models/showtime.model";
+import Genre from "../models/genre.model";
+import MovieGenre from "../models/movie-genre.model";
+import MovieRelease from "../models/movie-release.model";
+import UpcomingNotification from "../models/upcoming-notification.model";
 import Department from "../models/department.model";
 import City from "../models/city.model";
 import Country from "../models/country.model";
@@ -33,6 +41,7 @@ import ChatHistory from "../models/chat-history.model";
 import Pqrs from "../models/pqrs.model";
 import Notification from "../models/notification.model";
 import Voucher from "../models/voucher.model";
+import { AnyARecord } from "node:dns";
 
 
 
@@ -49,8 +58,28 @@ const sequelize = new Sequelize(
     port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
     dialect: "postgres",
     logging: false, // Desactiva logs SQL en consola (útil en producción)
-    models: [Membership, Department, City, Country, ApiClient, Audit, Rol, ChatHistory, Pqrs, Notification, Voucher], // User se registra mediante User.init(...)
-  }
-);
+    models: [
+      User, 
+      Membership, 
+      Movie,
+      Cinema,
+      Room,
+      Showtime,
+      Genre,
+      MovieGenre,
+      MovieRelease,
+      UpcomingNotification, 
+      Department, 
+      City, 
+      Country, 
+      ApiClient, 
+      Audit, 
+      Rol, 
+      ChatHistory, 
+      Pqrs, 
+      Notification, 
+      Voucher
+    ],
+});
 
 export default sequelize;

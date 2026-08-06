@@ -28,7 +28,7 @@ export class Voucher extends Model {
   })
   id!: number;
 
-  @ForeignKey(() => User as any)
+  @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
