@@ -7,10 +7,10 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Instalar dependencias (solo en la imagen base)
-RUN npm install
+RUN npm install --include=dev
 
 # Exponer el puerto
 EXPOSE 3000
 
 # Comando por defecto
-CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/index.ts"]
+CMD ["sh", "-c", "if [ ! -d node_modules ]; then npm install --include=dev; fi && npx ts-node-dev --respawn --transpile-only src/index.ts"]

@@ -1,6 +1,8 @@
 // app/src/models/room.model.ts
 
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
+import Cinema from "./cinema.model";
+import Showtime from "./showtime.model";
 
 export interface RoomAttributes {
   id: number;
@@ -8,6 +10,11 @@ export interface RoomAttributes {
   name: string;
   capacity: number;
   type: string;
+  screenType?: string;
+  soundSystem?: string;
+  totalRows?: number;
+  seatsPerRow?: number;
+  isActive?: boolean;
 }
 
 @Table({
@@ -22,11 +29,15 @@ export class Room extends Model {
   })
   id!: number;
 
+  @ForeignKey(() => Cinema)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
   cinemaId!: number;
+
+  @BelongsTo(() => Cinema)
+  cinema?: Cinema;
 
   @Column({
     type: DataType.STRING(100),
@@ -46,6 +57,40 @@ export class Room extends Model {
     defaultValue: "2D",
   })
   type!: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+  })
+  screenType?: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+  })
+  soundSystem?: string;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  totalRows?: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  seatsPerRow?: number;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  isActive!: boolean;
+
+  @HasMany(() => Showtime)
+  showtimes?: Showtime[];
 }
 
 export type RoomCreationAttributes = Partial<RoomAttributes>;

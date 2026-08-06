@@ -1,12 +1,16 @@
 // app/src/models/cinema.model.ts
 
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import Room from "./room.model";
 
 export interface CinemaAttributes {
   id: number;
   name: string;
   address: string;
   city: string;
+  phone?: string;
+  email?: string;
+  isActive?: boolean;
 }
 
 @Table({
@@ -38,6 +42,28 @@ export class Cinema extends Model {
     allowNull: false,
   })
   city!: string;
+
+  @Column({
+    type: DataType.STRING(30),
+    allowNull: true,
+  })
+  phone?: string;
+
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+  })
+  email?: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  isActive!: boolean;
+
+  @HasMany(() => Room)
+  rooms?: Room[];
 }
 
 export type CinemaCreationAttributes = Partial<CinemaAttributes>;

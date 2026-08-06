@@ -1,11 +1,5 @@
 // app/src/server.ts
 
-/**
- * Se encarga únicamente de configurar la aplicación Express: middlewares, rutas, swagger, etc.
- * No arranca el servidor ni toca la base de datos.
- * Esto hace que la aplicación sea testeable fácilmente, porque podemos importar app en nuestros tests sin necesidad de levantar el servidor real ni conectarse a la BD.
-*/
-
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./docs/swagger";
@@ -15,6 +9,8 @@ import membershipRoutes from "./routes/membership.routes";
 import authRoutes from "./routes/auth.routes";
 import movieRoutes from "./routes/movie.routes";
 import showtimeRoutes from "./routes/showtime.routes";
+import movieReleaseRoutes from "./routes/movie-release.routes";
+import upcomingNotificationRoutes from "./routes/upcoming-notification.routes";
 
 const app = express();
 
@@ -26,6 +22,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/membership", membershipRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/showtimes", showtimeRoutes);
+app.use("/api/releases", movieReleaseRoutes);
+app.use("/api/notifications", upcomingNotificationRoutes);
 
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

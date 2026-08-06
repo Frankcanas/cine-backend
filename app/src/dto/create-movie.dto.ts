@@ -10,5 +10,11 @@ export interface CreateMovieDto {
   backdropUrl?: string;
   releaseDate?: string;
   rating?: number;
+  voteCount?: number;
+  tagline?: string;
+  originalLanguage?: string;
+  classification?: string;
+  trailerUrl?: string;
+  status?: string;
   genreIds?: number[];
 }

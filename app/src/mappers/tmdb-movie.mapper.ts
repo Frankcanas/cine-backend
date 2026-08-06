@@ -14,7 +14,10 @@ export interface MappedMovie {
   rating: number;
   voteCount: number;
   duration?: number;
-  genres?: string[];
+  tagline?: string;
+  originalLanguage?: string;
+  genreIds?: number[];
+  genres?: { id: number; name: string }[];
 }
 
 /**
@@ -32,6 +35,8 @@ export class TMDBMovieMapper {
       releaseDate: tmdbMovie.release_date,
       rating: tmdbMovie.vote_average,
       voteCount: tmdbMovie.vote_count,
+      originalLanguage: tmdbMovie.original_language,
+      genreIds: tmdbMovie.genre_ids,
     };
   }
 
@@ -40,7 +45,8 @@ export class TMDBMovieMapper {
     return {
       ...base,
       duration: details.runtime,
-      genres: details.genres ? details.genres.map((g) => g.name) : [],
+      tagline: details.tagline,
+      genres: details.genres ? details.genres.map((g) => ({ id: g.id, name: g.name })) : [],
     };
   }
 }

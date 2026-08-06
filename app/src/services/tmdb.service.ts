@@ -30,8 +30,8 @@ export class TMDBService {
     return url.toString();
   }
 
-  async getPopularMovies(page = 1): Promise<MappedMovie[]> {
-    const url = this.buildUrl("/movie/popular", { page, language: "es-ES" });
+  async getPopularMovies(page = 1, language = "es-ES"): Promise<MappedMovie[]> {
+    const url = this.buildUrl("/movie/popular", { page, language });
     const response = await fetch(url, { headers: this.headers });
     if (!response.ok) {
       throw new Error(`Error en TMDB Service (${response.status}): ${response.statusText}`);
@@ -40,8 +40,28 @@ export class TMDBService {
     return data.results.map((movie) => TMDBMovieMapper.toDomain(movie));
   }
 
-  async searchMovies(query: string, page = 1): Promise<MappedMovie[]> {
-    const url = this.buildUrl("/search/movie", { query, page, language: "es-ES" });
+  async getUpcomingMovies(page = 1, language = "es-ES"): Promise<MappedMovie[]> {
+    const url = this.buildUrl("/movie/upcoming", { page, language });
+    const response = await fetch(url, { headers: this.headers });
+    if (!response.ok) {
+      throw new Error(`Error al obtener próximos estrenos de TMDB (${response.status}): ${response.statusText}`);
+    }
+    const data = (await response.json()) as TMDBResponse<TMDBMovie>;
+    return data.results.map((movie) => TMDBMovieMapper.toDomain(movie));
+  }
+
+  async getTopRatedMovies(page = 1, language = "es-ES"): Promise<MappedMovie[]> {
+    const url = this.buildUrl("/movie/top_rated", { page, language });
+    const response = await fetch(url, { headers: this.headers });
+    if (!response.ok) {
+      throw new Error(`Error al obtener películas mejor valoradas de TMDB (${response.status}): ${response.statusText}`);
+    }
+    const data = (await response.json()) as TMDBResponse<TMDBMovie>;
+    return data.results.map((movie) => TMDBMovieMapper.toDomain(movie));
+  }
+
+  async searchMovies(query: string, page = 1, language = "es-ES"): Promise<MappedMovie[]> {
+    const url = this.buildUrl("/search/movie", { query, page, language });
     const response = await fetch(url, { headers: this.headers });
     if (!response.ok) {
       throw new Error(`Error al buscar películas en TMDB (${response.status}): ${response.statusText}`);
@@ -50,8 +70,8 @@ export class TMDBService {
     return data.results.map((movie) => TMDBMovieMapper.toDomain(movie));
   }
 
-  async getMovieDetails(tmdbId: number): Promise<MappedMovie> {
-    const url = this.buildUrl(`/movie/${tmdbId}`, { language: "es-ES" });
+  async getMovieDetails(tmdbId: number, language = "es-ES"): Promise<MappedMovie> {
+    const url = this.buildUrl(`/movie/${tmdbId}`, { language });
     const response = await fetch(url, { headers: this.headers });
     if (!response.ok) {
       throw new Error(`Error al obtener detalle de TMDB ID ${tmdbId}: ${response.statusText}`);
@@ -60,8 +80,8 @@ export class TMDBService {
     return TMDBMovieMapper.toDomainDetail(data);
   }
 
-  async getGenres(): Promise<{ id: number; name: string }[]> {
-    const url = this.buildUrl("/genre/movie/list", { language: "es-ES" });
+  async getGenres(language = "es-ES"): Promise<{ id: number; name: string }[]> {
+    const url = this.buildUrl("/genre/movie/list", { language });
     const response = await fetch(url, { headers: this.headers });
     if (!response.ok) {
       throw new Error(`Error al obtener géneros de TMDB (${response.status}): ${response.statusText}`);

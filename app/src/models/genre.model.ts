@@ -1,6 +1,8 @@
 // app/src/models/genre.model.ts
 
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, BelongsToMany } from "sequelize-typescript";
+import Movie from "./movie.model";
+import MovieGenre from "./movie-genre.model";
 
 export interface GenreAttributes {
   id: number;
@@ -32,6 +34,9 @@ export class Genre extends Model {
     allowNull: false,
   })
   name!: string;
+
+  @BelongsToMany(() => Movie, () => MovieGenre)
+  movies?: Movie[];
 }
 
 export type GenreCreationAttributes = Partial<GenreAttributes>;

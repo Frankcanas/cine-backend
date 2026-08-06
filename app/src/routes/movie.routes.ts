@@ -8,8 +8,11 @@ import {
   updateMovie,
   deleteMovie,
   getPopularFromTmdb,
+  getUpcomingFromTmdb,
+  getTopRatedFromTmdb,
   searchTmdbMovies,
   syncMovieWithTmdb,
+  syncGenresFromTmdb,
 } from "../controllers/movie.controller";
 
 const router = Router();
@@ -25,12 +28,57 @@ const router = Router();
  *         name: page
  *         schema:
  *           type: integer
- *         description: Número de página
+ *       - in: query
+ *         name: language
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Lista de películas populares obtenida de TMDB
  */
 router.get("/tmdb/popular", getPopularFromTmdb);
+
+/**
+ * @swagger
+ * /api/movies/tmdb/upcoming:
+ *   get:
+ *     summary: Obtener próximos estrenos desde TMDB
+ *     tags: [Movies - TMDB]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: language
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de próximos estrenos obtenida de TMDB
+ */
+router.get("/tmdb/upcoming", getUpcomingFromTmdb);
+
+/**
+ * @swagger
+ * /api/movies/tmdb/top-rated:
+ *   get:
+ *     summary: Obtener películas mejor valoradas desde TMDB
+ *     tags: [Movies - TMDB]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: language
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Películas mejor valoradas
+ */
+router.get("/tmdb/top-rated", getTopRatedFromTmdb);
 
 /**
  * @swagger
@@ -44,7 +92,6 @@ router.get("/tmdb/popular", getPopularFromTmdb);
  *         required: true
  *         schema:
  *           type: string
- *         description: Término de búsqueda
  *       - in: query
  *         name: page
  *         schema:
@@ -57,9 +104,21 @@ router.get("/tmdb/search", searchTmdbMovies);
 
 /**
  * @swagger
+ * /api/movies/tmdb/sync-genres:
+ *   post:
+ *     summary: Sincronizar el catálogo de géneros desde TMDB a la base de datos local
+ *     tags: [Movies - TMDB]
+ *     responses:
+ *       200:
+ *         description: Géneros sincronizados exitosamente
+ */
+router.post("/tmdb/sync-genres", syncGenresFromTmdb);
+
+/**
+ * @swagger
  * /api/movies/tmdb/sync/{tmdbId}:
  *   post:
- *     summary: Sincronizar e importar una película de TMDB a la base de datos local
+ *     summary: Sincronizar e importar una película y sus géneros de TMDB a la BD local
  *     tags: [Movies - TMDB]
  *     parameters:
  *       - in: path
@@ -67,7 +126,6 @@ router.get("/tmdb/search", searchTmdbMovies);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID de la película en TMDB
  *     responses:
  *       201:
  *         description: Película importada/sincronizada correctamente en la BD local
@@ -78,8 +136,21 @@ router.post("/tmdb/sync/:tmdbId", syncMovieWithTmdb);
  * @swagger
  * /api/movies:
  *   get:
- *     summary: Obtener todas las películas locales
+ *     summary: Obtener todas las películas locales (incluyendo géneros, funciones y estrenos)
  *     tags: [Movies]
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: genreId
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Lista de películas locales
@@ -90,7 +161,7 @@ router.get("/", getMovies);
  * @swagger
  * /api/movies/{id}:
  *   get:
- *     summary: Obtener una película por ID local
+ *     summary: Obtener una película por ID local con sus asociaciones
  *     tags: [Movies]
  *     parameters:
  *       - in: path
@@ -127,6 +198,10 @@ router.get("/:id", getMovieById);
  *                 type: string
  *               duration:
  *                 type: integer
+ *               genreIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
  *     responses:
  *       201:
  *         description: Película creada exitosamente

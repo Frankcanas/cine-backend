@@ -9,10 +9,11 @@ const tmdbService = new TMDBService();
 
 export const getMovies = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { title, genreId } = req.query;
+    const { title, genreId, status } = req.query;
     const movies = await movieService.getMovies({
       title: title ? String(title) : undefined,
       genreId: genreId ? Number(genreId) : undefined,
+      status: status ? String(status) : undefined,
     });
     return res.status(200).json(movies);
   } catch (error: any) {
@@ -71,7 +72,30 @@ export const deleteMovie = async (req: Request, res: Response): Promise<Response
 export const getPopularFromTmdb = async (req: Request, res: Response): Promise<Response> => {
   try {
     const page = Number(req.query.page) || 1;
-    const movies = await tmdbService.getPopularMovies(page);
+    const language = String(req.query.language || "es-ES");
+    const movies = await tmdbService.getPopularMovies(page, language);
+    return res.status(200).json(movies);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getUpcomingFromTmdb = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const language = String(req.query.language || "es-ES");
+    const movies = await tmdbService.getUpcomingMovies(page, language);
+    return res.status(200).json(movies);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTopRatedFromTmdb = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const language = String(req.query.language || "es-ES");
+    const movies = await tmdbService.getTopRatedMovies(page, language);
     return res.status(200).json(movies);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -82,10 +106,11 @@ export const searchTmdbMovies = async (req: Request, res: Response): Promise<Res
   try {
     const query = String(req.query.query || "");
     const page = Number(req.query.page) || 1;
+    const language = String(req.query.language || "es-ES");
     if (!query) {
       return res.status(400).json({ error: "El parámetro de búsqueda 'query' es requerido" });
     }
-    const movies = await tmdbService.searchMovies(query, page);
+    const movies = await tmdbService.searchMovies(query, page, language);
     return res.status(200).json(movies);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -97,6 +122,15 @@ export const syncMovieWithTmdb = async (req: Request, res: Response): Promise<Re
     const tmdbId = Number(req.params.tmdbId);
     const movie = await movieService.syncWithTmdb(tmdbId);
     return res.status(201).json(movie);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const syncGenresFromTmdb = async (_req: Request, res: Response): Promise<Response> => {
+  try {
+    const genres = await movieService.syncGenresFromTmdb();
+    return res.status(200).json({ message: "Géneros sincronizados correctamente", genres });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

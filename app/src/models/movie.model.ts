@@ -1,6 +1,11 @@
 // app/src/models/movie.model.ts
 
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany, BelongsToMany } from "sequelize-typescript";
+import Showtime from "./showtime.model";
+import Genre from "./genre.model";
+import MovieGenre from "./movie-genre.model";
+import MovieRelease from "./movie-release.model";
+import UpcomingNotification from "./upcoming-notification.model";
 
 export interface MovieAttributes {
   id: number;
@@ -13,6 +18,12 @@ export interface MovieAttributes {
   backdropUrl?: string;
   releaseDate?: string;
   rating?: number;
+  voteCount?: number;
+  tagline?: string;
+  originalLanguage?: string;
+  classification?: string;
+  trailerUrl?: string;
+  status?: string;
   isActive?: boolean;
 }
 
@@ -85,11 +96,61 @@ export class Movie extends Model {
   rating?: number;
 
   @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+  })
+  voteCount?: number;
+
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+  })
+  tagline?: string;
+
+  @Column({
+    type: DataType.STRING(10),
+    allowNull: true,
+  })
+  originalLanguage?: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+  })
+  classification?: string;
+
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+  })
+  trailerUrl?: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+    defaultValue: "EN_CARTELERA",
+  })
+  status!: string;
+
+  @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: true,
   })
   isActive!: boolean;
+
+  @BelongsToMany(() => Genre, () => MovieGenre)
+  genres?: Genre[];
+
+  @HasMany(() => Showtime)
+  showtimes?: Showtime[];
+
+  @HasMany(() => MovieRelease)
+  releases?: MovieRelease[];
+
+  @HasMany(() => UpcomingNotification)
+  notifications?: UpcomingNotification[];
 }
 
 export type MovieCreationAttributes = Partial<MovieAttributes>;
