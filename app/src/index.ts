@@ -8,6 +8,9 @@
  * - Es el que realmente ejecutas cuando corres npm run dev o docker-compose up.
  */
 
+import dotenv from "dotenv";
+dotenv.config();
+
 import app from "./server";
 import sequelize from "./config/database";
 

@@ -6,7 +6,10 @@
  * Inicializa y exporta la instancia de Sequelize registrando todos los modelos.
  */
 
+import dotenv from "dotenv";
 import { Sequelize } from "sequelize-typescript";
+
+dotenv.config();
 import Membership from "../models/membreship.model";
 import User from "../models/user.model";
 import Movie from "../models/movie.model";
@@ -23,7 +26,7 @@ const sequelize = new Sequelize(
   process.env.POSTGRES_USER as string,
   process.env.POSTGRES_PASSWORD as string,
   {
-    host: process.env.POSTGRES_HOST || "db",
+    host: process.env.POSTGRES_HOST || "localhost",
     port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
     dialect: "postgres",
     logging: false,

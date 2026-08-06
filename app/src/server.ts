@@ -25,6 +25,13 @@ app.use("/api/showtimes", showtimeRoutes);
 app.use("/api/releases", movieReleaseRoutes);
 app.use("/api/notifications", upcomingNotificationRoutes);
 
+
+//Swagger json format 
+
+app.get("/api/docs.json",(_req, res) =>{
+    res.status(200).json(swaggerSpec);
+}
+)
 // Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
