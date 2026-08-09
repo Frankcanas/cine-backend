@@ -3,9 +3,59 @@
 import { Request, Response } from "express";
 import { MovieService } from "../services/movie.service";
 import { TMDBService } from "../services/tmdb.service";
+import { BillboardFilterDto } from "../dto/billboard-filter.dto";
 
 const movieService = new MovieService();
 const tmdbService = new TMDBService();
+
+const getBillboardFilters = (
+  req: Request
+): BillboardFilterDto => {
+  const availableQuery = req.query.available;
+
+  return {
+    title: req.query.title
+      ? String(req.query.title)
+      : undefined,
+
+    date: req.query.date
+      ? String(req.query.date)
+      : undefined,
+
+    genreId: req.query.genreId
+      ? Number(req.query.genreId)
+      : undefined,
+
+    classification: req.query.classification
+      ? String(req.query.classification)
+      : undefined,
+
+    language: req.query.language
+      ? String(req.query.language)
+      : undefined,
+
+    roomType: req.query.roomType
+      ? String(req.query.roomType)
+      : undefined,
+
+    format: req.query.format
+      ? String(req.query.format)
+      : undefined,
+
+    cinemaId: req.query.cinemaId
+      ? Number(req.query.cinemaId)
+      : undefined,
+
+    city: req.query.city
+      ? String(req.query.city)
+      : undefined,
+
+    available:
+      availableQuery === undefined
+        ? undefined
+        : String(availableQuery).toLowerCase() === "true",
+  };
+};
 
 export const getMovies = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -21,6 +71,74 @@ export const getMovies = async (req: Request, res: Response): Promise<Response> 
   }
 };
 
+export const getWeeklyMovies = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const filters = getBillboardFilters(req);
+
+    const result =
+      await movieService.getWeeklyBillboard(
+        filters
+      );
+
+    return res.status(200).json(result);
+
+  } catch (error: any) {
+
+    return res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+export const getTodayMovies = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const filters = getBillboardFilters(req);
+
+    const result =
+      await movieService.getTodayBillboard(
+        filters
+      );
+
+    return res.status(200).json(result);
+
+  } catch (error: any) {
+
+    return res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+export const filterMovies = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const filters = getBillboardFilters(req);
+
+    const result =
+      await movieService.getFilteredBillboard(
+        filters
+      );
+
+    return res.status(200).json(result);
+
+  } catch (error: any) {
+
+    const isDateError =
+      error.message.includes("fecha");
+
+    return res
+      .status(isDateError ? 400 : 500)
+      .json({
+        error: error.message,
+      });
+  }
+};
 export const getMovieById = async (req: Request, res: Response): Promise<Response> => {
   try {
     const id = Number(req.params.id);

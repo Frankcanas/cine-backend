@@ -1,0 +1,12 @@
+{
+  "name": "cine-backend-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root wrapper for cine-backend app",
+  "scripts": {
+    "dev": "npm --prefix app run dev",
+    "build": "npm --prefix app run build",
+    "start": "npm --prefix app start",
+    "test": "npm --prefix app test"
+  }
+}

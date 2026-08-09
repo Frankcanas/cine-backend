@@ -5,6 +5,8 @@ import Movie, { MovieCreationAttributes } from "../models/movie.model";
 import Genre from "../models/genre.model";
 import { CreateMovieDto } from "../dto/create-movie.dto";
 import { MovieFilterDto } from "../dto/movie-filter.dto";
+import { BillboardFilterDto } from "../dto/billboard-filter.dto";
+import { BillboardPeriod, BillboardResponse,} from "../types/billboard.types";
 import { TMDBService } from "./tmdb.service";
 
 export class MovieService {
@@ -49,6 +51,200 @@ export class MovieService {
   async getMovies(filter?: MovieFilterDto): Promise<Movie[]> {
     return await this.movieRepository.findAll(filter);
   }
+  async getWeeklyBillboard(
+  filter: BillboardFilterDto = {}
+): Promise<BillboardResponse> {
+
+  const from = new Date();
+
+  const to = new Date(from);
+  to.setDate(to.getDate() + 7);
+
+  return await this.buildBillboard(
+    "weekly",
+    from,
+    to,
+    filter
+  );
+}
+async getTodayBillboard(
+  filter: BillboardFilterDto = {}
+): Promise<BillboardResponse> {
+
+  const from = new Date();
+
+  const to = new Date(from);
+  to.setHours(24, 0, 0, 0);
+
+  return await this.buildBillboard(
+    "today",
+    from,
+    to,
+    filter
+  );
+}
+async getFilteredBillboard(
+  filter: BillboardFilterDto
+): Promise<BillboardResponse> {
+
+  if (!filter.date) {
+
+    const from = new Date();
+
+    const to = new Date(from);
+    to.setDate(to.getDate() + 7);
+
+    return await this.buildBillboard(
+      "filtered",
+      from,
+      to,
+      filter
+    );
+  }
+
+  const { from, to } =
+    this.createDateRange(filter.date);
+
+  return await this.buildBillboard(
+    "filtered",
+    from,
+    to,
+    filter
+  );
+}
+private async buildBillboard(
+  period: BillboardPeriod,
+  from: Date,
+  to: Date,
+  filter: BillboardFilterDto
+): Promise<BillboardResponse> {
+
+  const movies =
+    await this.movieRepository.findBillboard(
+      from,
+      to,
+      filter
+    );
+
+  const formattedMovies = movies.map((movie) => {
+
+    const data = movie.toJSON() as any;
+
+    const showtimes =
+      (data.showtimes ?? []).map(
+        (showtime: any) => {
+
+          const hasSeatInformation =
+            showtime.availableSeats !== null &&
+            showtime.availableSeats !== undefined;
+
+          return {
+            ...showtime,
+
+            soldOut:
+              hasSeatInformation &&
+              Number(showtime.availableSeats) <= 0,
+          };
+        }
+      );
+
+    const availableFormats =
+      Array.from(
+        new Set<string>(
+          showtimes.flatMap(
+            (showtime: any) =>
+              showtime.format
+                ? [showtime.format]
+                : []
+          )
+        )
+      );
+
+    const availableLanguages =
+      Array.from(
+        new Set<string>(
+          showtimes.flatMap(
+            (showtime: any) =>
+              showtime.language
+                ? [showtime.language]
+                : []
+          )
+        )
+      );
+
+    return {
+      ...data,
+      showtimes,
+      availableFormats,
+      availableLanguages,
+    };
+  });
+
+  return {
+    period,
+    from: from.toISOString(),
+    to: to.toISOString(),
+    totalMovies: formattedMovies.length,
+
+    message:
+      formattedMovies.length === 0
+        ? "No existen funciones activas para los filtros seleccionados."
+        : undefined,
+
+    movies: formattedMovies,
+  };
+}
+private createDateRange(
+  date: string
+): {
+  from: Date;
+  to: Date;
+} {
+
+  const parts =
+    date.split("-").map(Number);
+
+  if (parts.length !== 3) {
+    throw new Error(
+      "La fecha debe tener formato YYYY-MM-DD"
+    );
+  }
+
+  const [year, month, day] = parts;
+
+  const from = new Date(
+    year,
+    month - 1,
+    day,
+    0,
+    0,
+    0,
+    0
+  );
+
+  const isValidDate =
+    from.getFullYear() === year &&
+    from.getMonth() === month - 1 &&
+    from.getDate() === day;
+
+  if (!isValidDate) {
+    throw new Error(
+      "La fecha proporcionada no es válida"
+    );
+  }
+
+  const to = new Date(from);
+
+  to.setDate(
+    to.getDate() + 1
+  );
+
+  return {
+    from,
+    to,
+  };
+}
+
 
   async getMovieById(id: number): Promise<Movie | null> {
     return await this.movieRepository.findById(id);

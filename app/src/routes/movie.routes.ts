@@ -3,6 +3,9 @@
 import { Router } from "express";
 import {
   getMovies,
+  getWeeklyMovies,
+  getTodayMovies,
+  filterMovies,
   getMovieById,
   createMovie,
   updateMovie,
@@ -156,6 +159,410 @@ router.post("/tmdb/sync/:tmdbId", syncMovieWithTmdb);
  *         description: Lista de películas locales
  */
 router.get("/", getMovies);
+
+/**
+ * @swagger
+ * /api/movies/weekly:
+ *   get:
+ *     summary: Obtener la cartelera semanal
+ *     description: >
+ *       Retorna las películas activas que tienen funciones disponibles
+ *       desde el momento actual hasta los próximos siete días.
+ *       Permite aplicar filtros opcionales por título, ciudad, género,
+ *       clasificación, idioma, tipo de sala, formato, complejo y disponibilidad.
+ *     tags:
+ *       - Billboard
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Título o parte del título de la película.
+ *         example: Superman
+ *
+ *       - in: query
+ *         name: city
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Ciudad donde se encuentran los complejos.
+ *         example: Medellín
+ *
+ *       - in: query
+ *         name: genreId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Identificador local del género.
+ *         example: 28
+ *
+ *       - in: query
+ *         name: classification
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Clasificación de la película.
+ *         example: PG-13
+ *
+ *       - in: query
+ *         name: language
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Idioma disponible para la función.
+ *         example: Español
+ *
+ *       - in: query
+ *         name: roomType
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Tipo de sala.
+ *         example: VIP
+ *
+ *       - in: query
+ *         name: format
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Formato de proyección disponible.
+ *         example: 2D
+ *
+ *       - in: query
+ *         name: cinemaId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Identificador del complejo de cine.
+ *         example: 1
+ *
+ *       - in: query
+ *         name: available
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: >
+ *           Si es true, únicamente retorna funciones que tengan
+ *           asientos disponibles.
+ *         example: true
+ *
+ *     responses:
+ *       200:
+ *         description: Cartelera semanal consultada correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 period:
+ *                   type: string
+ *                   example: weekly
+ *                 from:
+ *                   type: string
+ *                   format: date-time
+ *                 to:
+ *                   type: string
+ *                   format: date-time
+ *                 totalMovies:
+ *                   type: integer
+ *                   example: 3
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                   example: No existen funciones activas para los filtros seleccionados.
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Error interno del servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error interno del servidor
+ */
+router.get("/weekly", getWeeklyMovies);
+
+/**
+ * @swagger
+ * /api/movies/today:
+ *   get:
+ *     summary: Obtener la cartelera del día
+ *     description: >
+ *       Retorna las películas activas que tienen funciones pendientes
+ *       desde el momento actual hasta finalizar el día.
+ *       Permite aplicar filtros opcionales sobre la cartelera.
+ *     tags:
+ *       - Billboard
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Título o parte del título de la película.
+ *         example: Superman
+ *
+ *       - in: query
+ *         name: city
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Ciudad donde se encuentran los complejos.
+ *         example: Medellín
+ *
+ *       - in: query
+ *         name: genreId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Identificador del género.
+ *         example: 28
+ *
+ *       - in: query
+ *         name: classification
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Clasificación de la película.
+ *         example: PG-13
+ *
+ *       - in: query
+ *         name: language
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Idioma de la función.
+ *         example: Español
+ *
+ *       - in: query
+ *         name: roomType
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Tipo de sala.
+ *         example: VIP
+ *
+ *       - in: query
+ *         name: format
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Formato de proyección.
+ *         example: 2D
+ *
+ *       - in: query
+ *         name: cinemaId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Identificador del complejo.
+ *         example: 1
+ *
+ *       - in: query
+ *         name: available
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: >
+ *           Si es true, excluye las funciones que no tengan
+ *           asientos disponibles.
+ *         example: true
+ *
+ *     responses:
+ *       200:
+ *         description: Cartelera del día consultada correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 period:
+ *                   type: string
+ *                   example: today
+ *                 from:
+ *                   type: string
+ *                   format: date-time
+ *                 to:
+ *                   type: string
+ *                   format: date-time
+ *                 totalMovies:
+ *                   type: integer
+ *                   example: 2
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Error interno del servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.get("/today", getTodayMovies);
+
+/**
+ * @swagger
+ * /api/movies/filter:
+ *   get:
+ *     summary: Filtrar la cartelera
+ *     description: >
+ *       Permite consultar la cartelera utilizando uno o varios filtros.
+ *       Si se envía una fecha, retorna las funciones correspondientes
+ *       a ese día. Si no se envía una fecha, consulta los próximos siete días.
+ *     tags:
+ *       - Billboard
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Fecha que se desea consultar en formato YYYY-MM-DD.
+ *         example: 2026-08-10
+ *
+ *       - in: query
+ *         name: title
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Título o parte del título de la película.
+ *         example: Superman
+ *
+ *       - in: query
+ *         name: city
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Ciudad de la cartelera.
+ *         example: Medellín
+ *
+ *       - in: query
+ *         name: genreId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Identificador del género.
+ *         example: 28
+ *
+ *       - in: query
+ *         name: classification
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Clasificación de la película.
+ *         example: PG-13
+ *
+ *       - in: query
+ *         name: language
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Idioma de la función.
+ *         example: Español
+ *
+ *       - in: query
+ *         name: roomType
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Tipo de sala.
+ *         example: VIP
+ *
+ *       - in: query
+ *         name: format
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Formato de proyección.
+ *         example: 3D
+ *
+ *       - in: query
+ *         name: cinemaId
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Identificador del complejo de cine.
+ *         example: 2
+ *
+ *       - in: query
+ *         name: available
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: >
+ *           Si es true, excluye las funciones que tengan cero
+ *           asientos disponibles.
+ *         example: true
+ *
+ *     responses:
+ *       200:
+ *         description: Cartelera filtrada correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 period:
+ *                   type: string
+ *                   example: filtered
+ *                 from:
+ *                   type: string
+ *                   format: date-time
+ *                 to:
+ *                   type: string
+ *                   format: date-time
+ *                 totalMovies:
+ *                   type: integer
+ *                   example: 1
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       400:
+ *         description: Alguno de los filtros enviados es inválido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: La fecha proporcionada no es válida
+ *       500:
+ *         description: Error interno del servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.get("/filter", filterMovies);
+
 
 /**
  * @swagger

@@ -14,6 +14,7 @@ services:
       - ./.env
     environment:
       - NODE_ENV=${NODE_ENV}
+      - POSTGRES_HOST=db
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       - db
