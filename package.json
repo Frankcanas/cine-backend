@@ -8,5 +8,11 @@
     "build": "npm --prefix app run build",
     "start": "npm --prefix app start",
     "test": "npm --prefix app test"
+  },
+  "dependencies": {
+    "cors": "^2.8.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19"
   }
 }
