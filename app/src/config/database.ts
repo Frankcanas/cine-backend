@@ -23,6 +23,7 @@
 import { Sequelize } from "sequelize-typescript";
 import Membership from "../models/membreship.model";
 import Token from "../models/token.model";
+import VerifiedUser from "../models/verified-user.model";
 
 
 /**
@@ -38,7 +39,7 @@ const sequelize = new Sequelize(
     port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
     dialect: "postgres",
     logging: false,
-    models: [Membership, Token], // User se registra mediante User.init(...)
+    models: [Membership, Token, VerifiedUser], // User se registra mediante User.init(...)
   }
 );
 
