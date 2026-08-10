@@ -1,6 +1,7 @@
 // app/src/models/role.model.ts
 
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import User from "./user.model";
 
 export interface RoleAttributes {
   id: number;
@@ -24,6 +25,9 @@ export class Role extends Model {
     allowNull: false,
   })
   name!: string;
+
+  @HasMany(() => User)
+  users?: User[];
 }
 
 export type RoleCreationAttributes = Partial<RoleAttributes>;

@@ -6,6 +6,9 @@ import Genre from "./genre.model";
 import MovieGenre from "./movie-genre.model";
 import MovieRelease from "./movie-release.model";
 import UpcomingNotification from "./upcoming-notification.model";
+import PremiereRequest from "./premiere-request.model";
+import Recommendation from "./recommendation.model";
+import Promotion from "./promotion.model";
 
 export interface MovieAttributes {
   id: number;
@@ -13,6 +16,7 @@ export interface MovieAttributes {
   title: string;
   originalTitle?: string;
   synopsis?: string;
+  director?: string;
   duration?: number;
   posterUrl?: string;
   backdropUrl?: string;
@@ -63,6 +67,12 @@ export class Movie extends Model {
     allowNull: true,
   })
   synopsis?: string;
+
+  @Column({
+    type: DataType.STRING(150),
+    allowNull: true,
+  })
+  director?: string;
 
   @Column({
     type: DataType.INTEGER,
@@ -150,7 +160,16 @@ export class Movie extends Model {
   releases?: MovieRelease[];
 
   @HasMany(() => UpcomingNotification)
-  notifications?: UpcomingNotification[];
+  upcomingNotifications?: UpcomingNotification[];
+
+  @HasMany(() => PremiereRequest)
+  premiereRequests?: PremiereRequest[];
+
+  @HasMany(() => Recommendation)
+  recommendations?: Recommendation[];
+
+  @HasMany(() => Promotion)
+  promotions?: Promotion[];
 }
 
 export type MovieCreationAttributes = Partial<MovieAttributes>;

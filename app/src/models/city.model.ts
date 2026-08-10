@@ -1,7 +1,10 @@
 // app/src/models/city.model.ts
 
-import { Table, Column, Model, DataType, ForeignKey } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import Department from "./department.model";
+import Cinema from "./cinema.model";
+import User from "./user.model";
+import Promotion from "./promotion.model";
 
 export interface CityAttributes {
   id: number;
@@ -30,6 +33,9 @@ export class City extends Model {
   })
   departmentId!: number;
 
+  @BelongsTo(() => Department)
+  department?: Department;
+
   @Column({
     type: DataType.STRING(100),
     allowNull: false,
@@ -42,6 +48,15 @@ export class City extends Model {
     defaultValue: true,
   })
   active!: boolean;
+
+  @HasMany(() => Cinema)
+  cinemas?: Cinema[];
+
+  @HasMany(() => User)
+  users?: User[];
+
+  @HasMany(() => Promotion)
+  promotions?: Promotion[];
 }
 
 export type CityCreationAttributes = Partial<CityAttributes>;

@@ -1,6 +1,7 @@
 // app/src/models/country.model.ts
 
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import Department from "./department.model";
 
 export interface CountryAttributes {
   id: number;
@@ -24,6 +25,9 @@ export class Country extends Model {
     allowNull: false,
   })
   name!: string;
+
+  @HasMany(() => Department)
+  departments?: Department[];
 }
 
 export type CountryCreationAttributes = Partial<CountryAttributes>;

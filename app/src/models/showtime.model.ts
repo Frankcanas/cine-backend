@@ -1,18 +1,24 @@
 // app/src/models/showtime.model.ts
 
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany, HasOne } from "sequelize-typescript";
 import Movie from "./movie.model";
 import Room from "./room.model";
+import Format from "./format.model";
+import Language from "./language.model";
+import SeatLock from "./seat-lock.model";
+import CartTicket from "./cart-ticket.model";
+import Ticket from "./ticket.model";
+import FlashCinema from "./flash-cinema.model";
 
 export interface ShowtimeAttributes {
   id: number;
   movieId: number;
   roomId: number;
+  formatId: number;
+  languageId: number;
   startTime: Date;
   endTime: Date;
   price: number;
-  language?: string;
-  format?: string;
   availableSeats?: number;
   status?: string;
 }
@@ -49,6 +55,28 @@ export class Showtime extends Model {
   @BelongsTo(() => Room)
   room?: Room;
 
+  @ForeignKey(() => Format)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    field: "format_id",
+  })
+  formatId!: number;
+
+  @BelongsTo(() => Format)
+  format?: Format;
+
+  @ForeignKey(() => Language)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    field: "language_id",
+  })
+  languageId!: number;
+
+  @BelongsTo(() => Language)
+  language?: Language;
+
   @Column({
     type: DataType.DATE,
     allowNull: false,
@@ -68,20 +96,6 @@ export class Showtime extends Model {
   price!: number;
 
   @Column({
-    type: DataType.STRING(50),
-    allowNull: true,
-    defaultValue: "Español",
-  })
-  language?: string;
-
-  @Column({
-    type: DataType.STRING(30),
-    allowNull: true,
-    defaultValue: "2D",
-  })
-  format?: string;
-
-  @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
@@ -93,6 +107,18 @@ export class Showtime extends Model {
     defaultValue: "AVAILABLE",
   })
   status!: string;
+
+  @HasMany(() => SeatLock)
+  seatLocks?: SeatLock[];
+
+  @HasMany(() => CartTicket)
+  cartTickets?: CartTicket[];
+
+  @HasMany(() => Ticket)
+  tickets?: Ticket[];
+
+  @HasOne(() => FlashCinema)
+  flashCinema?: FlashCinema;
 }
 
 export type ShowtimeCreationAttributes = Partial<ShowtimeAttributes>;

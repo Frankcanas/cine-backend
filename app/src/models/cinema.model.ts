@@ -1,13 +1,16 @@
 // app/src/models/cinema.model.ts
 
-import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
+import City from "./city.model";
 import Room from "./room.model";
+import User from "./user.model";
+import Promotion from "./promotion.model";
 
 export interface CinemaAttributes {
   id: number;
+  cityId: number;
   name: string;
   address: string;
-  city: string;
   phone?: string;
   email?: string;
   isActive?: boolean;
@@ -25,6 +28,17 @@ export class Cinema extends Model {
   })
   id!: number;
 
+  @ForeignKey(() => City)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    field: "city_id",
+  })
+  cityId!: number;
+
+  @BelongsTo(() => City)
+  city?: City;
+
   @Column({
     type: DataType.STRING(150),
     allowNull: false,
@@ -36,12 +50,6 @@ export class Cinema extends Model {
     allowNull: false,
   })
   address!: string;
-
-  @Column({
-    type: DataType.STRING(100),
-    allowNull: false,
-  })
-  city!: string;
 
   @Column({
     type: DataType.STRING(30),
@@ -64,6 +72,12 @@ export class Cinema extends Model {
 
   @HasMany(() => Room)
   rooms?: Room[];
+
+  @HasMany(() => User)
+  favoritedByUsers?: User[];
+
+  @HasMany(() => Promotion)
+  promotions?: Promotion[];
 }
 
 export type CinemaCreationAttributes = Partial<CinemaAttributes>;

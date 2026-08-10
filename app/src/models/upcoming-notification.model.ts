@@ -1,4 +1,8 @@
 // app/src/models/upcoming-notification.model.ts
+//
+// NOTA: esta entidad no existe en el MER (no hay UPCOMING_NOTIFICATION).
+// Se conserva porque ya estaba implementada y en uso; solo se corrigió
+// la ruta de importación de "../user.model" a "./user.model".
 
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import User from "./user.model";
