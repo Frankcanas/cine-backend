@@ -10,9 +10,6 @@
 import dotenv from 'dotenv';
 dotenv.config(); 
 
-import dotenv from "dotenv";
-dotenv.config();
-
 import app from "./server";
 import sequelize from "./config/database";
 

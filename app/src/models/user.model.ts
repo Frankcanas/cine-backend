@@ -24,7 +24,7 @@ export interface UserAttributes {
   tableName: "users",
   timestamps: true,
 })
-export class User extends Model<UserAttributes> implements UserAttributes {
+export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   @PrimaryKey
   @AutoIncrement
   @Column({
