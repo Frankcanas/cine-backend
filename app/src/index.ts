@@ -7,6 +7,8 @@
  * - Arrancar el servidor (app.listen).
  * - Es el que realmente ejecutas cuando corres npm run dev o docker-compose up.
  */
+import dotenv from 'dotenv';
+dotenv.config(); 
 
 import dotenv from "dotenv";
 dotenv.config();

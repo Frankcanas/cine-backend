@@ -33,6 +33,14 @@ import { IntegerDataType } from "sequelize";
  * };
  */
 
+export interface PasswordValidationDto {
+    tieneMinuscula: boolean;
+    tieneMayuscula: boolean;
+    tieneNumero: boolean;
+    tieneEspecial: boolean;
+    longitudValida: boolean;
+    esValida: boolean;
+}
 export interface CreateUserDto {
 
     /**
@@ -57,5 +65,5 @@ export interface CreateUserDto {
 
     city: string;
 
+    passwordStatus?: PasswordValidationDto;
 }
-

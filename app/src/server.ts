@@ -12,6 +12,8 @@ import movieRoutes from "./routes/movie.routes";
 import showtimeRoutes from "./routes/showtime.routes";
 import movieReleaseRoutes from "./routes/movie-release.routes";
 import upcomingNotificationRoutes from "./routes/upcoming-notification.routes";
+import tokenRoutes from "./routes/token.routes";
+import emailRoutes from "./routes/email.routes";
 
 const app = express();
 
@@ -23,6 +25,8 @@ app.use(express.json());
 // Rutas
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", tokenRoutes);
+app.use("/api/mail", emailRoutes);
 app.use("/api/membership", membershipRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/showtimes", showtimeRoutes);

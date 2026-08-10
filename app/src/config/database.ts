@@ -12,6 +12,8 @@ import { Sequelize } from "sequelize-typescript";
 dotenv.config();
 import Membership from "../models/membreship.model";
 import User from "../models/user.model";
+import Token from "../models/token.model";
+import VerifiedUser from "../models/verified-user.model";
 import Movie from "../models/movie.model";
 import Cinema from "../models/cinema.model";
 import Room from "../models/room.model";
@@ -33,6 +35,8 @@ const sequelize = new Sequelize(
     models: [
       Membership,
       User,
+      Token,
+      VerifiedUser,
       Movie,
       Cinema,
       Room,

@@ -31,6 +31,14 @@ class UserRepository implements IUserRepository {
         return await User.findAll();
 
     }
+    /**
+     * Obtiene un usuario por su ID.
+     */
+    async findByid(id: number): Promise<User | null> {
+
+        return await User.findByPk(id);
+
+    }
 
 }
 

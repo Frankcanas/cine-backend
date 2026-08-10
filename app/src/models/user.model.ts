@@ -1,9 +1,12 @@
 // app/src/models/user.model.ts
 
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import Membership from "./membreship.model";
 import UpcomingNotification from "./upcoming-notification.model";
 
+/**
+ * Atributos principales de la entidad `User`.
+ */
 export interface UserAttributes {
   id: number;
   name: string;
@@ -14,15 +17,18 @@ export interface UserAttributes {
   membershipId?: number;
 }
 
+/**
+ * Clase que representa el modelo `User` en Sequelize.
+ */
 @Table({
   tableName: "users",
   timestamps: true,
 })
-export class User extends Model {
+export class User extends Model<UserAttributes> implements UserAttributes {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
   })
   id!: number;
 

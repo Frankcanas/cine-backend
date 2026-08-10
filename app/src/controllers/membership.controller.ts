@@ -20,3 +20,14 @@ export const createMembership = async (req: Request, res: Response): Promise<Res
         });
       }
     };
+
+export const getAllMemberships = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const memberships = await membreshipService.getAll();
+        return res.status(200).json(memberships);
+    } catch (error: any) {
+        return res.status(500).json({
+            error: error.message,
+        });
+    }
+};

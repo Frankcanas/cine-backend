@@ -85,6 +85,36 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
         // Construcción del DTO recibido desde el cliente.
         const dto: CreateUserDto = req.body;
 
+        // Validación para que el correo escrito tenga por lo menos un arroba.
+        if (!dto.email || !dto.email.includes('@')) {
+            return res.status(400).json({
+                error: 'Email inválido'
+            });
+        }
+
+        // Busqueda de usuarios registrados para evitar correos/numeros duplicados.
+        const euser = await userService.findAll();
+
+        // Validación para que el correo escrito no esté registrado.
+        if (euser.some(u => u.email === dto.email)) {
+            return res.status(400).json({
+                error: 'Email ya registrado'
+            });
+        }
+
+        //validación para que el número de teléfono escrito no esté registrado.
+        if (euser.some(u => u.phoneNumber === dto.phoneNumber)) {
+            return res.status(400).json({
+                error: 'Número de teléfono ya registrado'
+            });
+        }
+
+        if (dto.password.length < 10 && dto.password) {
+            return res.status(400).json({
+                error: 'La contraseña debe tener al menos 10 caracteres'
+            });
+        }
+
         // Delega la lógica de negocio al servicio.
         const user = await userService.create(dto);
 
@@ -92,6 +122,11 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
         return res.status(201).json(user);
 
     } catch (error: any) {
+
+        // Errores de validación lanzados por el servicio deben retornar 400
+        if (error && (error.code === 'INVALID_PASSWORD' || error.message && error.message.startsWith('Password inválida'))) {
+            return res.status(400).json({ error: error.message });
+        }
 
         return res.status(500).json({
             error: error.message

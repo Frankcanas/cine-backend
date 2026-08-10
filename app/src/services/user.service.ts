@@ -1,9 +1,20 @@
 // app/src/services/user.service.ts
 
 import User from "../models/user.model";
-import { CreateUserDto } from "../dto/create-user.dto";
+import { CreateUserDto, PasswordValidationDto } from "../dto/create-user.dto";
 import repository from "../repositories/user.repository";
 import { IUserService } from "./interfaces/user.service.interface";
+
+// Valida los requisitos de la contraseña y devuelve un DTO con el estado
+function validatePassword(password: string): PasswordValidationDto {
+    const tieneMinuscula = /[a-z]/.test(password);
+    const tieneMayuscula = /[A-Z]/.test(password);
+    const tieneNumero = /[0-9]/.test(password);
+    const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const longitudValida = typeof password === 'string' && password.length >= 10;
+    const esValida = !!password && tieneMinuscula && tieneMayuscula && tieneNumero && tieneEspecial && longitudValida;
+    return { tieneMinuscula, tieneMayuscula, tieneNumero, tieneEspecial, longitudValida, esValida };
+}
 
 /**
  * Servicio de Usuarios
@@ -53,6 +64,18 @@ class UserService implements IUserService {
          *  - Enviar un correo de bienvenida.
          */
 
+        // Validar la contraseña antes de crear el usuario
+        const passwordStatus: PasswordValidationDto = validatePassword(dto.password);
+        if (!passwordStatus.esValida) {
+            const message = 'La contraseña debe tener mayúscula, minúscula, número, carácter especial y 10 o más caracteres.';
+            const err: any = new Error(message);
+            err.code = 'INVALID_PASSWORD';
+            throw err;
+        }
+
+        // opcional: adjuntar estado de validación al DTO
+        dto.passwordStatus = passwordStatus;
+
         return await repository.create(dto);
 
     }
@@ -85,6 +108,29 @@ class UserService implements IUserService {
      */
     async findAll(): Promise<User[]> {
         return await repository.findAll();
+    }
+
+    /** 
+     * Recupera un usuario por su ID.
+     *
+     * Este método delega la consulta al repositorio de usuarios, el cual es el
+     * responsable de interactuar con la base de datos. En esta capa podrían
+     * incorporarse reglas de negocio adicionales, como validaciones o transformaciones
+     * de los datos antes de ser enviados al controlador.
+     *
+     * @async
+     * @param {number} id - El ID del usuario a buscar.
+     * @returns {Promise<User | null>} Promesa que resuelve con un objeto de tipo
+     *                                 {@link User} si se encuentra el usuario, o
+     *                                 `null` si no se encuentra.
+     *
+     * @example
+     * const user = await userService.findById(1);
+     *  
+    */
+
+    async findById(id: number): Promise<User | null> {
+        return await repository.findByid(id);
     }
 
 }
