@@ -13,8 +13,7 @@
  * Este modelo es utilizado por los servicios y controladores para realizar operaciones CRUD.
  */
 
-import { DataTypes, INTEGER, Model, Optional } from "sequelize";
-import sequelize from "../config/database";
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement } from "sequelize-typescript";
 
 /**
  * Atributos principales de la entidad `User`.
@@ -29,80 +28,57 @@ export interface UserAttributes {
 }
 
 /**
- * Atributos utilizados para la creación de un nuevo usuario.
- * 
- * Se utiliza `Optional` para indicar que `id` no es requerido al momento
- * de la creación, ya que se genera automáticamente por la base de datos.
- */
-export interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
-
-/**
  * Clase que representa el modelo `User` en Sequelize.
  * 
- * Implementa los atributos definidos en `UserAttributes` y `UserCreationAttributes`.
+ * Implementa los atributos definidos en `UserAttributes`.
  */
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+@Table({
+  tableName: "users",
+  timestamps: true,
+})
+class User extends Model<UserAttributes> implements UserAttributes {
   /** Identificador único del usuario (clave primaria). */
-  public id!: number;
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER,
+  })
+  id!: number;
 
   /** Nombre completo del usuario. */
-  public name!: string;
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: false,
+  })
+  name!: string;
 
   /** Dirección de correo electrónico única del usuario. */
-  public email!: string;
+  @Column({
+    type: DataType.STRING(100),
+    unique: true,
+    allowNull: false,
+  })
+  email!: string;
   
   /** Numero de telefono unico del usuario */
-  public phoneNumber!: string;
+  @Column({
+    type: DataType.STRING(30),
+    unique: true,
+    allowNull: false,
+  })
+  phoneNumber!: string;
 
-  public password!: string;
+  @Column({
+    type: DataType.STRING(150),
+    allowNull: false,
+  })
+  password!: string;
 
-  public city!: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  city!: string;
 }
-
-/**
- * Inicialización del modelo `User` con la configuración de Sequelize.
- * 
- * - `id`: Entero autoincremental, clave primaria.
- * - `name`: Nombre obligatorio con máximo 100 caracteres.
- * - `email`: Correo electrónico único y obligatorio con máximo 100 caracteres.
- * - ´number´: Numero de telefono unico y olbigatorio 
- */
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING(100),
-      unique: true,
-      allowNull: false,
-    },
-    phoneNumber: {
-      type: DataTypes.STRING(30),
-      unique: true,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  {
-    sequelize,
-    modelName: "User",      // Nombre del modelo en Sequelize
-    tableName: "users",     // Nombre de la tabla en la base de datos
-    timestamps: true,      // Incluye createdAt y updatedAt
-  }
-);
 
 export default User;

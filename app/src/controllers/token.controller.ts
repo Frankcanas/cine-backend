@@ -31,6 +31,10 @@ export class AuthController {
       await this.authService.requestVerificationToken(user.id, user.email);
       return res.status(200).json({ message: 'Código de verificación enviado al correo del usuario.' });
     } catch (error) {
+      // Verificar si el usuario ya está verificado
+      if (error instanceof Error && error.message === 'El usuario ya está verificado.') {
+        return res.status(409).json({ error: 'El usuario ya está verificado.' });
+      }
       return res.status(500).json({ error: 'Error interno al procesar la solicitud.' });
     }
   };
