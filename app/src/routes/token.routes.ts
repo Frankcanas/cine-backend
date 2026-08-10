@@ -88,14 +88,52 @@ router.post('/request-token', authController.handleRequestToken);
  *               userId:
  *                 type: integer
  *                 example: 1
+ *                 description: ID del usuario que desea verificar.
  *               token:
  *                 type: string
  *                 example: "123456"
+ *                 description: Código de verificación recibido por correo.
  *     responses:
  *       200:
  *         description: Token validado con éxito.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Token validado con éxito."
  *       400:
- *         description: Email o token inválidos / Token expirado.
+ *         description: Datos faltantes, código incorrecto o código expirado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "El código introducido es incorrecto."
+ *       404:
+ *         description: Usuario no encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no encontrado."
+ *       409:
+ *         description: El usuario ya está verificado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "El usuario ya está verificado."
  *       500:
  *         description: Error interno al verificar el token.
  */

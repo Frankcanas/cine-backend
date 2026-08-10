@@ -55,6 +55,10 @@ export class AuthController {
       const result = await this.authService.verifyToken(user.id, token);
 
       if (!result.success) {
+        // Verificar si el usuario ya está verificado (409) o si es otro tipo de error (400)
+        if (result.message === 'El usuario ya está verificado.') {
+          return res.status(409).json({ error: result.message });
+        }
         return res.status(400).json({ error: result.message });
       }
 
