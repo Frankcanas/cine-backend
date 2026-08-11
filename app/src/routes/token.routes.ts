@@ -26,8 +26,44 @@ const authController = new AuthController();
  *     responses:
  *       200:
  *         description: Código de verificación enviado al correo.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Código de verificación enviado al correo del usuario."
  *       400:
- *         description: El email es obligatorio.
+ *         description: El userId es obligatorio.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "El userId es obligatorio."
+ *       404:
+ *         description: Usuario no encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no encontrado."
+ *       409:
+ *         description: El usuario ya está verificado y no puede solicitar un nuevo código.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "El usuario ya está verificado."
  *       500:
  *         description: Error interno al procesar la solicitud.
  */

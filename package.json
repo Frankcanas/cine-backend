@@ -1,16 +1,16 @@
 {
-  "name": "app",
+  "name": "cine-backend-root",
   "version": "1.0.0",
-  "description": "API con Node, Express, TypeScript, Swagger, Jest y Sequelize para PostgreSQL",
-  "main": "dist/index.js",
+  "private": true,
+  "description": "Root wrapper for cine-backend app",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "jest --passWithNoTests"
+    "dev": "npm --prefix app run dev",
+    "build": "npm --prefix app run build",
+    "start": "npm --prefix app start",
+    "test": "npm --prefix app test"
   },
   "dependencies": {
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "nodemailer": "^9.0.3",
@@ -21,7 +21,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
+    "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.14",

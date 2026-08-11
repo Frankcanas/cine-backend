@@ -1,46 +1,35 @@
 // app/src/docs/swagger.ts
 
-/**
- * Swagger Configuration
- * ---------------------
- * Este archivo configura la documentación automática de la API
- * utilizando `swagger-jsdoc` y `swagger-ui-express`.
- *
- * - Genera un esquema OpenAPI (3.0.0).
- * - Extrae la documentación de las anotaciones JSDoc ubicadas en `src/routes/*.ts`.
- *
- * Acceso a la documentación:
- *  - La especificación generada es consumida por `swagger-ui-express`.
- *  - Disponible en `/api/docs` (ver `server.ts`).
- */
-
+import path from "path";
 import swaggerJSDoc from "swagger-jsdoc";
 
-/**
- * Opciones de configuración para swagger-jsdoc.
- *
- * `definition`:
- *  - Define la versión de OpenAPI.
- *  - Contiene información básica de la API (título, versión, descripción).
- *
- * `apis`:
- *  - Indica la ruta donde se ubican los archivos con anotaciones JSDoc
- *    que describen los endpoints (en este caso, los archivos de rutas).
- */
-const options = {
+const options: swaggerJSDoc.Options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Cine Backend API",
+      title: "Riwi Cine API",
       version: "1.0.0",
-      description: "Documentación generada automáticamente con Swagger para Cine Backend.",
+      description: "API de gestión del sistema Multicine.",
     },
+    servers: [
+      {
+        url: "/",
+        description: "Servidor actual (relativo)",
+      },
+      {
+        url: "http://localhost:3000",
+        description: "Servidor local (localhost:3000)",
+      },
+      {
+        url: "http://127.0.0.1:3000",
+        description: "Servidor IP local (127.0.0.1:3000)",
+      },
+    ],
   },
-  apis: ["./src/routes/*.ts"], // Escanea las rutas para extraer anotaciones Swagger
+  apis: [
+    path.join(__dirname, "../routes/*.ts").replace(/\\/g, "/"),
+    path.join(__dirname, "../routes/*.js").replace(/\\/g, "/"),
+  ],
 };
 
-/**
- * Esquema de especificación Swagger/OpenAPI generado dinámicamente.
- * Este objeto es exportado y utilizado por `swagger-ui-express`.
- */
 export const swaggerSpec = swaggerJSDoc(options);

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/token.service';
 import { TokenRepository } from '../repositories/token.repository';
+import verifiedUserRepository from '../repositories/verified-user.repository';
 import { EmailService } from '../services/email.service';
 import userService from '../services/user.service';
 import { RequestTokenDTO, VerifyTokenDTO } from '../dto/create-token';
@@ -11,7 +12,7 @@ export class AuthController {
   constructor() {
     const tokenRepository = new TokenRepository();
     const emailService = new EmailService();
-    this.authService = new AuthService(tokenRepository, emailService);
+    this.authService = new AuthService(tokenRepository, verifiedUserRepository, emailService);
   }
 
   handleRequestToken = async (req: Request, res: Response): Promise<Response> => {
@@ -30,6 +31,10 @@ export class AuthController {
       await this.authService.requestVerificationToken(user.id, user.email);
       return res.status(200).json({ message: 'Código de verificación enviado al correo del usuario.' });
     } catch (error) {
+      // Verificar si el usuario ya está verificado
+      if (error instanceof Error && error.message === 'El usuario ya está verificado.') {
+        return res.status(409).json({ error: 'El usuario ya está verificado.' });
+      }
       return res.status(500).json({ error: 'Error interno al procesar la solicitud.' });
     }
   };

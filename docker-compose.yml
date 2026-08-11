@@ -3,15 +3,18 @@ services:
     build: ./app
     container_name: ${APP_CONTAINER_NAME}
     working_dir: /usr/src/app
+    command: sh -c "if [ ! -d node_modules ]; then npm install --include=dev; fi && npx ts-node-dev --respawn --transpile-only src/index.ts"
     ports:
       - "${APP_PORT}:3000"
     volumes:
       - ./app:/usr/src/app
+      - /usr/src/app/node_modules
       - ./.env:/usr/src/app/.env
     env_file:
       - ./.env
     environment:
       - NODE_ENV=${NODE_ENV}
+      - POSTGRES_HOST=db
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       - db

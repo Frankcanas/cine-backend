@@ -15,7 +15,7 @@ export class EmailService implements IEmailService {
 
   async sendVerificationEmail(to: string, token: string): Promise<void> {
     const mailOptions = {
-      from: `"Tu Aplicación" <${process.env.SMTP_USER}>`,
+      from: `"Riwi-Cine" <${process.env.SMTP_USER}>`,
       to,
       subject: 'Código de verificación de seguridad',
       text: `Tu código de verificación es: ${token}. Expira en 15 minutos.`,
