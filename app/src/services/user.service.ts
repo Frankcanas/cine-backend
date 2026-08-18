@@ -7,13 +7,13 @@ import { IUserService } from "./interfaces/user.service.interface";
 
 // Valida los requisitos de la contraseña y devuelve un DTO con el estado
 function validatePassword(password: string): PasswordValidationDto {
-    const tieneMinuscula = /[a-z]/.test(password);
-    const tieneMayuscula = /[A-Z]/.test(password);
-    const tieneNumero = /[0-9]/.test(password);
-    const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const longitudValida = typeof password === 'string' && password.length >= 10;
-    const esValida = !!password && tieneMinuscula && tieneMayuscula && tieneNumero && tieneEspecial && longitudValida;
-    return { tieneMinuscula, tieneMayuscula, tieneNumero, tieneEspecial, longitudValida, esValida };
+    const lowercase = /[a-z]/.test(password);
+    const uppercase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const specialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const validLenght = typeof password === 'string' && password.length >= 10;
+    const isValid = !!password && lowercase && uppercase && hasNumber && specialCharacter && validLenght;
+    return { lowercase, uppercase, hasNumber, specialCharacter, validLenght, isValid };
 }
 
 /**
@@ -66,7 +66,7 @@ class UserService implements IUserService {
 
         // Validar la contraseña antes de crear el usuario
         const passwordStatus: PasswordValidationDto = validatePassword(dto.password);
-        if (!passwordStatus.esValida) {
+        if (!passwordStatus.isValid) {
             const message = 'La contraseña debe tener mayúscula, minúscula, número, carácter especial y 10 o más caracteres.';
             const err: any = new Error(message);
             err.code = 'INVALID_PASSWORD';
