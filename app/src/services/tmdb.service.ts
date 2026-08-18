@@ -40,6 +40,17 @@ export class TMDBService {
     return data.results.map((movie) => TMDBMovieMapper.toDomain(movie));
   }
 
+  // FCB - Modificado: Se agregó endpoint para obtener películas en cines (Now Playing)
+  async getNowPlayingMovies(page = 1, language = "es-ES"): Promise<MappedMovie[]> {
+    const url = this.buildUrl("/movie/now_playing", { page, language });
+    const response = await fetch(url, { headers: this.headers });
+    if (!response.ok) {
+      throw new Error(`Error al obtener cartelera de TMDB (${response.status}): ${response.statusText}`);
+    }
+    const data = (await response.json()) as TMDBResponse<TMDBMovie>;
+    return data.results.map((movie) => TMDBMovieMapper.toDomain(movie));
+  }
+
   async getUpcomingMovies(page = 1, language = "es-ES"): Promise<MappedMovie[]> {
     const url = this.buildUrl("/movie/upcoming", { page, language });
     const response = await fetch(url, { headers: this.headers });

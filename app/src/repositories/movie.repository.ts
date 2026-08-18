@@ -8,6 +8,7 @@ import { IMovieRepository } from "./interfaces/movie.repository.interface";
 import { MovieFilterDto } from "../dto/movie-filter.dto";
 import Room from "../models/room.model";
 import Cinema from "../models/cinema.model";
+import City from "../models/city.model";
 import { BillboardFilterDto } from "../dto/billboard-filter.dto";
 
 import { Op } from "sequelize";
@@ -108,11 +109,7 @@ export class MovieRepository implements IMovieRepository {
     cinemaWhere.id = filter.cinemaId;
   }
 
-  if (filter.city) {
-    cinemaWhere.city = {
-      [Op.iLike]: filter.city,
-    };
-  }
+  // city is now filtered via the City include in the query below
 
   const genreInclude: any = {
     model: Genre,
@@ -149,6 +146,8 @@ export class MovieRepository implements IMovieRepository {
                 model: Cinema,
                 required: true,
                 where: cinemaWhere,
+                // FCB - Modificado: Integración de la entidad City en la búsqueda de cartelera
+                include: filter.city ? [{ model: City, as: 'cityObj', where: { name: { [Op.iLike]: filter.city } } }] : [],
               },
             ],
           },
