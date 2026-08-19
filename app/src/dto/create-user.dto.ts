@@ -34,12 +34,12 @@ import { IntegerDataType } from "sequelize";
  */
 
 export interface PasswordValidationDto {
-    tieneMinuscula: boolean;
-    tieneMayuscula: boolean;
-    tieneNumero: boolean;
-    tieneEspecial: boolean;
-    longitudValida: boolean;
-    esValida: boolean;
+    lowercase: boolean;
+    uppercase: boolean;
+    hasNumber: boolean;
+    specialCharacter: boolean;
+    validLenght: boolean;
+    isValid: boolean;
 }
 export interface CreateUserDto {
 

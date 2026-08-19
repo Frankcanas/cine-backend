@@ -22,6 +22,9 @@ import Genre from "../models/genre.model";
 import MovieGenre from "../models/movie-genre.model";
 import MovieRelease from "../models/movie-release.model";
 import UpcomingNotification from "../models/upcoming-notification.model";
+// FCB - Modificado: Importación de modelos geográficos (HU-002)
+import Country from "../models/country.model";
+import City from "../models/city.model";
 
 const sequelize = new Sequelize(
   process.env.POSTGRES_DB as string,
@@ -45,6 +48,8 @@ const sequelize = new Sequelize(
       MovieGenre,
       MovieRelease,
       UpcomingNotification,
+      Country,
+      City,
     ],
   }
 );

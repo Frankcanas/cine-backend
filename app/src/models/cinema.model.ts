@@ -1,7 +1,8 @@
 // app/src/models/cinema.model.ts
 
-import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import Room from "./room.model";
+import City from "./city.model";
 
 export interface CinemaAttributes {
   id: number;
@@ -39,9 +40,20 @@ export class Cinema extends Model {
 
   @Column({
     type: DataType.STRING(100),
-    allowNull: false,
+    allowNull: true, // changed to true for backward compatibility if needed, or we can keep it
   })
   city!: string;
+
+  // FCB - Modificado: Se añadió la relación geográfica directa con City (HU-002)
+  @ForeignKey(() => City)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  cityId?: number;
+
+  @BelongsTo(() => City)
+  cityObj?: City;
 
   @Column({
     type: DataType.STRING(30),

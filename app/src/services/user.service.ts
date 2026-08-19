@@ -4,135 +4,42 @@ import User from "../models/user.model";
 import { CreateUserDto, PasswordValidationDto } from "../dto/create-user.dto";
 import repository from "../repositories/user.repository";
 import { IUserService } from "./interfaces/user.service.interface";
+import { hashPassword } from "../utils/password";
 
-// Valida los requisitos de la contraseña y devuelve un DTO con el estado
 function validatePassword(password: string): PasswordValidationDto {
-    const tieneMinuscula = /[a-z]/.test(password);
-    const tieneMayuscula = /[A-Z]/.test(password);
-    const tieneNumero = /[0-9]/.test(password);
-    const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const longitudValida = typeof password === 'string' && password.length >= 10;
-    const esValida = !!password && tieneMinuscula && tieneMayuscula && tieneNumero && tieneEspecial && longitudValida;
-    return { tieneMinuscula, tieneMayuscula, tieneNumero, tieneEspecial, longitudValida, esValida };
+    const lowercase = /[a-z]/.test(password);
+    const uppercase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const specialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const validLenght = typeof password === 'string' && password.length >= 10;
+    const isValid = !!password && lowercase && uppercase && hasNumber && specialCharacter && validLenght;
+    return { lowercase, uppercase, hasNumber, specialCharacter, validLenght, isValid };
 }
-
-/**
- * Servicio de Usuarios
- * --------------------
- * Contiene toda la lógica de negocio relacionada con la entidad User.
- *
- * Responsabilidades:
- *  - Validar reglas de negocio.
- *  - Coordinar operaciones entre uno o varios repositorios.
- *  - Orquestar procesos antes y después de persistir información.
- *  - Mantener al controlador libre de lógica de negocio.
- *
- * Ejemplos de reglas de negocio:
- *
- *  Verificar que el correo electrónico no exista antes de crear el usuario.
- *  Validar que el dominio del correo pertenezca a la empresa.
- *  Encriptar la contraseña antes de almacenarla.
- *  Asignar un rol por defecto (Ej. "CLIENTE").
- *  Registrar un log de auditoría de la operación.
- *  Enviar un correo de bienvenida después del registro.
- *  Crear automáticamente un perfil asociado al usuario.
- *
- * El Service conoce las reglas del negocio.
- * El Repository únicamente conoce cómo guardar y consultar información.
- */
 
 class UserService implements IUserService {
 
     async create(dto: CreateUserDto): Promise<User> {
-
-        /**
-         * Ejemplo de regla de negocio:
-         *
-         * Antes de crear un usuario podríamos validar que el correo
-         * electrónico no se encuentre registrado.
-         *
-         * const existingUser = await repository.findByEmail(dto.email);
-         *
-         * if (existingUser) {
-         *     throw new Error("El correo electrónico ya se encuentra registrado.");
-         * }
-         *
-         * También podríamos:
-         *  - Encriptar la contraseña.
-         *  - Asignar un rol por defecto.
-         *  - Registrar la operación en una bitácora.
-         *  - Enviar un correo de bienvenida.
-         */
-
-        // Validar la contraseña antes de crear el usuario
         const passwordStatus: PasswordValidationDto = validatePassword(dto.password);
-        if (!passwordStatus.esValida) {
+        if (!passwordStatus.isValid) {
             const message = 'La contraseña debe tener mayúscula, minúscula, número, carácter especial y 10 o más caracteres.';
             const err: any = new Error(message);
             err.code = 'INVALID_PASSWORD';
             throw err;
         }
 
-        // opcional: adjuntar estado de validación al DTO
         dto.passwordStatus = passwordStatus;
+        dto.password = await hashPassword(dto.password);
 
         return await repository.create(dto);
-
     }
 
-    /**
-     * Recupera todos los usuarios registrados en el sistema.
-     *
-     * Este método delega la consulta al repositorio de usuarios, el cual es el
-     * responsable de interactuar con la base de datos. En esta capa podrían
-     * incorporarse reglas de negocio adicionales, como filtros, paginación,
-     * ordenamiento o transformaciones de los datos antes de ser enviados al
-     * controlador.
-     *
-     * @async
-     * @returns {Promise<User[]>} Promesa que resuelve con un arreglo de objetos
-     *                            de tipo {@link User} que representan los usuarios
-     *                            encontrados en la base de datos.
-     *
-     * @example
-     * const users = await userService.findAll();
-     *
-     * console.log(users);
-     * // [
-     * //   {
-     * //     id: 1,
-     * //     name: "David",
-     * //     email: "david@example.com"
-     * //   }
-     * // ]
-     */
     async findAll(): Promise<User[]> {
         return await repository.findAll();
     }
 
-    /** 
-     * Recupera un usuario por su ID.
-     *
-     * Este método delega la consulta al repositorio de usuarios, el cual es el
-     * responsable de interactuar con la base de datos. En esta capa podrían
-     * incorporarse reglas de negocio adicionales, como validaciones o transformaciones
-     * de los datos antes de ser enviados al controlador.
-     *
-     * @async
-     * @param {number} id - El ID del usuario a buscar.
-     * @returns {Promise<User | null>} Promesa que resuelve con un objeto de tipo
-     *                                 {@link User} si se encuentra el usuario, o
-     *                                 `null` si no se encuentra.
-     *
-     * @example
-     * const user = await userService.findById(1);
-     *  
-    */
-
     async findById(id: number): Promise<User | null> {
         return await repository.findByid(id);
     }
-
 }
 
 export default new UserService();

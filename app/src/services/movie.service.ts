@@ -180,6 +180,47 @@ private async buildBillboard(
     };
   });
 
+  // FCB - Modificado: Mezcla de películas de cartelera (TMDB Now Playing) con la base de datos local
+  // Fetch TMDB Now Playing movies and mix them with the local movies
+  try {
+    const tmdbLanguage = filter.language || "es-ES";
+    const tmdbMovies = await this.tmdbService.getNowPlayingMovies(1, tmdbLanguage);
+    
+    // Create a Set of local tmdbIds for quick filtering
+    const localTmdbIds = new Set(
+      formattedMovies.map((m) => m.tmdbId).filter(id => id != null)
+    );
+    
+    // Format TMDB movies to match the Billboard structure
+    const additionalTmdbMovies = tmdbMovies
+      .filter((tmdbMovie) => !localTmdbIds.has(tmdbMovie.tmdbId))
+      .map((tmdbMovie) => ({
+        id: `tmdb-${tmdbMovie.tmdbId}`, // dummy id to distinguish them or keep it as tmdbId
+        tmdbId: tmdbMovie.tmdbId,
+        title: tmdbMovie.title,
+        originalTitle: tmdbMovie.originalTitle,
+        synopsis: tmdbMovie.synopsis,
+        duration: tmdbMovie.duration || 120, // default if missing
+        posterUrl: tmdbMovie.posterUrl,
+        backdropUrl: tmdbMovie.backdropUrl,
+        releaseDate: tmdbMovie.releaseDate,
+        rating: tmdbMovie.rating,
+        voteCount: tmdbMovie.voteCount,
+        status: "EN_CARTELERA",
+        isActive: true,
+        genres: tmdbMovie.genres || [],
+        showtimes: [], // No local functions yet
+        availableFormats: [],
+        availableLanguages: [],
+      }));
+
+    // Mix both arrays
+    formattedMovies.push(...additionalTmdbMovies);
+  } catch (err) {
+    console.error("Error fetching TMDB movies for Billboard:", err);
+    // If it fails, we just continue with local movies
+  }
+
   return {
     period,
     from: from.toISOString(),
@@ -188,7 +229,7 @@ private async buildBillboard(
 
     message:
       formattedMovies.length === 0
-        ? "No existen funciones activas para los filtros seleccionados."
+        ? "No existen funciones activas ni películas en cartelera para los filtros seleccionados."
         : undefined,
 
     movies: formattedMovies,
