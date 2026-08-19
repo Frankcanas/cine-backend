@@ -40,6 +40,15 @@ class UserRepository implements IUserRepository {
 
     }
 
+    /**
+     * Obtiene un usuario por su email.
+     */
+    async findByEmail(email: string): Promise<User | null> {
+
+        return await User.findOne({ where: { email } });
+
+    }
+
 }
 
 export default new UserRepository();

@@ -22,4 +22,14 @@ export interface IUserRepository {
      */
     findAll(): Promise<User[]>;
 
+    /**
+     * Obtiene un usuario por ID.
+     */
+    findByid(id: number): Promise<User | null>;
+
+    /**
+     * Obtiene un usuario por email.
+     */
+    findByEmail(email: string): Promise<User | null>;
+
 }

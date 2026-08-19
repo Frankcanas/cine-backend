@@ -32,11 +32,13 @@ export interface UserAttributes {
  * 
  * Implementa los atributos definidos en `UserAttributes`.
  */
+export type UserCreationAttributes = Omit<UserAttributes, "id">;
+
 @Table({
   tableName: "users",
   timestamps: true,
 })
-class User extends Model<UserAttributes> implements UserAttributes {
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   /** Identificador único del usuario (clave primaria). */
   @PrimaryKey
   @AutoIncrement
@@ -69,7 +71,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
   phoneNumber!: string;
 
   @Column({
-    type: DataType.STRING(150),
+    type: DataType.STRING(255),
     allowNull: false,
   })
   password!: string;
