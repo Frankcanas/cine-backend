@@ -20,11 +20,14 @@ export interface UserAttributes {
 /**
  * Clase que representa el modelo `User` en Sequelize.
  */
+export type UserCreationAttributes = Omit<UserAttributes, "id">;
+
 @Table({
   tableName: "users",
   timestamps: true,
 })
-export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  /** Identificador único del usuario (clave primaria). */
   @PrimaryKey
   @AutoIncrement
   @Column({
@@ -53,7 +56,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   phoneNumber!: string;
 
   @Column({
-    type: DataType.STRING(150),
+    type: DataType.STRING(255),
     allowNull: false,
   })
   password!: string;
@@ -78,6 +81,5 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   notifications?: UpcomingNotification[];
 }
 
-export type UserCreationAttributes = Partial<UserAttributes>;
 
 export default User;
