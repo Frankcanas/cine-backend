@@ -3,7 +3,7 @@ services:
     build: ./app
     container_name: ${APP_CONTAINER_NAME}
     working_dir: /usr/src/app
-    command: sh -c "if [ ! -d node_modules ]; then npm install --include=dev; fi && npx ts-node-dev --respawn --transpile-only src/index.ts"
+    command: sh -c "npm install --include=dev && npx ts-node-dev --respawn --transpile-only src/index.ts"
     ports:
       - "${APP_PORT}:3000"
     volumes:
