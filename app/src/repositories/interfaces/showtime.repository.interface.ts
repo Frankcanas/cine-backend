@@ -1,7 +1,7 @@
 // app/src/repositories/interfaces/showtime.repository.interface.ts
 
 import Showtime, { ShowtimeCreationAttributes } from "../../models/showtime.model";
-
+import { ShowtimeFilterDto } from "../../dto/showtime-filter.dto";
 export interface IShowtimeRepository {
   create(showtimeData: ShowtimeCreationAttributes): Promise<Showtime>;
   findAll(): Promise<Showtime[]>;
@@ -10,4 +10,5 @@ export interface IShowtimeRepository {
   findByRoomId(roomId: number): Promise<Showtime[]>;
   update(id: number, showtimeData: Partial<ShowtimeCreationAttributes>): Promise<[number]>;
   delete(id: number): Promise<number>;
+  findByMovieWithFilters(movieId: number, filters:ShowtimeFilterDto ): Promise<Showtime[]>;
 }

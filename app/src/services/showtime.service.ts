@@ -3,6 +3,7 @@
 import { ShowtimeRepository } from "../repositories/showtime.repository";
 import Showtime, { ShowtimeAttributes, ShowtimeCreationAttributes } from "../models/showtime.model";
 import { CreateShowtimeDto } from "../dto/create-showtime.dto";
+import { ShowtimeFilterDto } from "../dto/showtime-filter.dto";
 
 export class ShowtimeService {
   private showtimeRepository: ShowtimeRepository;
@@ -53,5 +54,8 @@ export class ShowtimeService {
   async deleteShowtime(id: number): Promise<boolean> {
     const affected = await this.showtimeRepository.delete(id);
     return affected > 0;
+  }
+  async getShowtimesForMovie(movieId: number, filters: ShowtimeFilterDto): Promise<Showtime[]> {
+  return await this.showtimeRepository.findByMovieWithFilters(movieId, filters);
   }
 }

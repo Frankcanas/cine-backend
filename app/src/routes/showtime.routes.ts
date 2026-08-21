@@ -1,5 +1,4 @@
 // app/src/routes/showtime.routes.ts
-
 import { Router } from "express";
 import {
   getShowtimes,
@@ -7,6 +6,7 @@ import {
   createShowtime,
   updateShowtime,
   deleteShowtime,
+  getShowtimesByMovieId,
 } from "../controllers/showtime.controller";
 
 const router = Router();
@@ -132,5 +132,34 @@ router.put("/:id", updateShowtime);
  *         description: Función eliminada exitosamente
  */
 router.delete("/:id", deleteShowtime);
+
+
+/**
+ * @swagger
+ * /api/movies/{movieId}/showtimes:
+ *   get:
+ *     summary: Obtener funciones disponibles para una película, con filtros de formato e idioma
+ *     tags: [Showtimes]
+ *     parameters:
+ *       - in: path
+ *         name: movieId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: format
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: language
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de funciones con sala y asientos disponibles
+ *       400:
+ *         description: movieId inválido
+ */
+router.get("/:movieId/showtimes", getShowtimesByMovieId);
 
 export default router;

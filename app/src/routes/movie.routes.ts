@@ -1,5 +1,4 @@
 // app/src/routes/movie.routes.ts
-
 import { Router } from "express";
 import {
   getMovies,
@@ -656,5 +655,6 @@ router.put("/:id", updateMovie);
  *         description: Película eliminada
  */
 router.delete("/:id", deleteMovie);
+
 
 export default router;
