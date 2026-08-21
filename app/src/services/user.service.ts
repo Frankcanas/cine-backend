@@ -2,6 +2,7 @@
 
 import User from "../models/user.model";
 import { CreateUserDto, PasswordValidationDto } from "../dto/create-user.dto";
+import { UserProfileDto } from "../dto/user-profile.dto";
 import repository from "../repositories/user.repository";
 import { IUserService } from "./interfaces/user.service.interface";
 import { hashPassword } from "../utils/password";
@@ -39,6 +40,45 @@ class UserService implements IUserService {
 
     async findById(id: number): Promise<User | null> {
         return await repository.findByid(id);
+    }
+
+    async getProfile(userId: number): Promise<UserProfileDto | null> {
+
+        const user = await repository.findByIdWithMembership(userId);
+
+        if (!user) {
+            return null;
+        }
+
+        const membership = user.membership;
+
+        let active = false;
+        let expiresAt: Date | null = null;
+
+        if (membership && user.membershipStartDate) {
+            const startDate = new Date(user.membershipStartDate);
+            expiresAt = new Date(startDate);
+            expiresAt.setDate(expiresAt.getDate() + membership.durationDays);
+            active = expiresAt.getTime() > Date.now();
+        }
+
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            city: user.city,
+            membership: {
+                active,
+                level: membership?.level || null,
+                points: user.points,
+                membershipName: membership?.name || null,
+                benefits: membership?.description || null,
+                expiresAt
+            }
+            
+        };
+
     }
 }
 

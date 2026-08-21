@@ -32,4 +32,9 @@ export interface IUserRepository {
      */
     findByEmail(email: string): Promise<User | null>;
 
+    /**
+     * Obtiene un usuario por su ID, incluyendo la relación con su membresía.
+     */
+    findByIdWithMembership(id: number): Promise<User | null>;
+
 }

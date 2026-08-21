@@ -69,10 +69,22 @@ router.post('/login', async (req: Request, res: Response) => {
         if (!passwordMatches) {
             return res.status(401).json({ message: 'Credenciales inválidas (contraseña incorrecta)' });
         }
+        
+        const payload = {
+            userId: user.id,
+            email: user.email,
+        }
+
+        const token = jwt.sign(
+            payload,
+            String (process.env.JWT_SECRET),
+            { expiresIn: (process.env.JWT_EXPIRES_IN || '30m') as any }
+        );
 
         return res.status(200).json({
             message: '¡Login exitoso!',
-            datos: { 
+            token,
+            datos: {
                 id: user.id,
                 name: user.name,
                 email: user.email

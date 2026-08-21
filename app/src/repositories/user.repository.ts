@@ -1,6 +1,7 @@
 // app/src/repositories/user.repository.ts
 
 import User, { UserCreationAttributes } from "../models/user.model";
+import Membership from "../models/membreship.model";
 import { IUserRepository } from "./interfaces/user.repository.interface";
 
 /**
@@ -46,6 +47,15 @@ class UserRepository implements IUserRepository {
     async findByEmail(email: string): Promise<User | null> {
 
         return await User.findOne({ where: { email } });
+
+    }
+
+    
+    async findByIdWithMembership(id: number): Promise<User | null> {
+
+        return await User.findByPk(id, {
+            include: [{ model: Membership }],
+        });
 
     }
 

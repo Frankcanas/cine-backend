@@ -9,6 +9,7 @@ export interface MembershipAttributes {
   price: number;
   durationDays: number;
   description?: string;
+  level?: string;
 }
 
 @Table({
@@ -46,6 +47,12 @@ export class Membership extends Model {
     allowNull: true,
   })
   description?: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+  })
+  level?: string;
 
   @HasMany(() => User)
   users?: User[];

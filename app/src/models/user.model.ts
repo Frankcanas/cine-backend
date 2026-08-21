@@ -15,6 +15,8 @@ export interface UserAttributes {
   password: string;
   city?: string;
   membershipId?: number;
+  points?: number;
+  membershipStartDate?: Date;
 }
 
 /**
@@ -76,6 +78,20 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   @BelongsTo(() => Membership)
   membership?: Membership;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  points!: number;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  membershipStartDate?: Date;
+
 
   @HasMany(() => UpcomingNotification)
   notifications?: UpcomingNotification[];
