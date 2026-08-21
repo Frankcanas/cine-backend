@@ -1,0 +1,6 @@
+// app/src/dto/showtime-filter.dto.ts
+
+export interface ShowtimeFilterDto {
+  format?: string;   // 2D, 3D, IMAX...
+  language?: string; // Doblada, Subtitulada...
+}

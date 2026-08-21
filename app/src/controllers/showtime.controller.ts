@@ -2,6 +2,7 @@
 
 import { Request, Response } from "express";
 import { ShowtimeService } from "../services/showtime.service";
+import { ShowtimeFilterDto } from "../dto/showtime-filter.dto";
 
 const showtimeService = new ShowtimeService();
 
@@ -69,4 +70,25 @@ export const deleteShowtime = async (req: Request, res: Response): Promise<Respo
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
-};
+}
+
+export const getShowtimesByMovieId = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const movieId = Number(req.params.movieId);
+    if (isNaN(movieId)) {
+      return res.status(400).json({ error: "movieId inválido" });
+    }
+
+    const { format, language } = req.query;
+    const filters: ShowtimeFilterDto = {
+      format: format ? String(format) : undefined,
+      language: language ? String(language) : undefined,
+    };
+
+    const showtimes = await showtimeService.getShowtimesForMovie(movieId, filters);
+    return res.status(200).json(showtimes);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+  };
+
