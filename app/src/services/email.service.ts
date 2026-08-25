@@ -25,7 +25,7 @@ export class EmailService implements IEmailService {
     await transporter.sendMail(mailOptions);
   }
 
-    async sendUserCreationEmail(to: string): Promise<void> {
+  async sendUserCreationEmail(to: string): Promise<void> {
     const mailOptions = {
       from: `"Riwi-Cine" <${process.env.SMTP_USER}>`,
       to,
@@ -34,7 +34,23 @@ export class EmailService implements IEmailService {
       html: `
         <p>¡Bienvenido(a) a Riwi Cine!</p>
         <p>Tu cuenta ha sido creada correctamente.</p>
-        <p>Verifica tu cuenta para poder disfrutar de todas nuestras funciones.</p>
+        <p>Ahora puedes iniciar sesión y disfrutar de todas nuestras funciones.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
+
+  async passwordRecoveryEmail(to: string, token: string): Promise<void> {
+    const mailOptions = {
+      from: `"Riwi-Cine" <${process.env.SMTP_USER}>`,
+      to,
+      subject: 'Recuperación de contraseña',
+      text: `Tu token para recuperar la contraseña es: ${token}. Expira en 15 minutos.`,
+      html: `
+        <p>Recuperación de contraseña</p>
+        <p>Tu token para recuperar la contraseña es: <b>${token}</b>.</p>
+        <p>Expira en 15 minutos.</p>
       `,
     };
 

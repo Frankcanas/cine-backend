@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { EmailController } from '../controllers/email.controller';
+import { EmailController, recoverPassword } from '../controllers/email.controller';
 
 const router = Router();
 
@@ -41,5 +41,35 @@ const router = Router();
  *         description: Error en el servidor o credenciales SMTP inválidas
  */
 router.post('/email', EmailController);
+
+/**
+ * @openapi
+ * /api/mail/password-recovery:
+ *   post:
+ *     summary: Enviar correo de recuperación de contraseña
+ *     tags: [Mail]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: usuario@correo.com
+ *     responses:
+ *       200:
+ *         description: Correo de recuperación enviado
+ *       400:
+ *         description: Email inválido
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error en el servidor
+ */
+router.post('/password-recovery', recoverPassword);
 
 export default router;

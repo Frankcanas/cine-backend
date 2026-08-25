@@ -7,16 +7,25 @@ export class TokenRepository implements ITokenRepository {
   }
 
   async findLatestTokenByUserId(userId: number): Promise<IToken | null> {
-  const record = await Token.findOne({
-    where: { userId },
-    order: [['createdAt', 'DESC']],
-  });
+    const record = await Token.findOne({
+      where: { userId },
+      order: [['createdAt', 'DESC']],
+    });
     return record ? (record.toJSON() as IToken) : null;
   }
 
   async findLatestToken(userId: number, token: string): Promise<IToken | null> {
     const record = await Token.findOne({
       where: { userId, token },
+      order: [['createdAt', 'DESC']],
+    });
+
+    return record ? (record.toJSON() as IToken) : null;
+  }
+
+  async findLatestTokenByEmail(email: string, token: string): Promise<IToken | null> {
+    const record = await Token.findOne({
+      where: { email, token },
       order: [['createdAt', 'DESC']],
     });
 
@@ -32,4 +41,4 @@ export class TokenRepository implements ITokenRepository {
   }
 }
 
-  
+

@@ -4,18 +4,8 @@ import User from "../models/user.model";
 import { CreateUserDto, PasswordValidationDto } from "../dto/create-user.dto";
 import repository from "../repositories/user.repository";
 import { IUserService } from "./interfaces/user.service.interface";
-import { hashPassword } from "../utils/password";
+import { hashPassword, validatePassword } from "../utils/password";
 import { EmailService } from "./email.service";
-
-function validatePassword(password: string): PasswordValidationDto {
-    const lowercase = /[a-z]/.test(password);
-    const uppercase = /[A-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const specialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const validLenght = typeof password === 'string' && password.length >= 10;
-    const isValid = !!password && lowercase && uppercase && hasNumber && specialCharacter && validLenght;
-    return { lowercase, uppercase, hasNumber, specialCharacter, validLenght, isValid };
-}
 
 class UserService implements IUserService {
 
@@ -30,7 +20,7 @@ class UserService implements IUserService {
         const createdUser = await repository.create(dto);
         const emailService = new EmailService();
         await emailService.sendUserCreationEmail(createdUser.email);
-        return createdUser
+        return createdUser;
     }
 
     async findAll(): Promise<User[]> {
