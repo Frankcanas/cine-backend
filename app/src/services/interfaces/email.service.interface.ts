@@ -13,4 +13,5 @@ export interface SendEmailDto{
 export interface IEmailService {
     send(options: SendEmailDto): Promise<void>;
     sendVerificationEmail(to: string, token: string): Promise<void>;
+    sendUserCreationEmail(to:string): Promise<void>;
 }

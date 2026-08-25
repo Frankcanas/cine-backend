@@ -24,4 +24,20 @@ export class EmailService implements IEmailService {
 
     await transporter.sendMail(mailOptions);
   }
+
+    async sendUserCreationEmail(to: string): Promise<void> {
+    const mailOptions = {
+      from: `"Riwi-Cine" <${process.env.SMTP_USER}>`,
+      to,
+      subject: '¡Bienvenido a Riwi Cine!',
+      text: 'Bienvenido(a) a Riwi Cine! Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión y disfrutar de todas nuestras funciones.',
+      html: `
+        <p>¡Bienvenido(a) a Riwi Cine!</p>
+        <p>Tu cuenta ha sido creada correctamente.</p>
+        <p>Verifica tu cuenta para poder disfrutar de todas nuestras funciones.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
 }

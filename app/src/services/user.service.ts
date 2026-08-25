@@ -5,6 +5,7 @@ import { CreateUserDto, PasswordValidationDto } from "../dto/create-user.dto";
 import repository from "../repositories/user.repository";
 import { IUserService } from "./interfaces/user.service.interface";
 import { hashPassword } from "../utils/password";
+import { EmailService } from "./email.service";
 
 function validatePassword(password: string): PasswordValidationDto {
     const lowercase = /[a-z]/.test(password);
@@ -26,11 +27,10 @@ class UserService implements IUserService {
             err.code = 'INVALID_PASSWORD';
             throw err;
         }
-
-        dto.passwordStatus = passwordStatus;
-        dto.password = await hashPassword(dto.password);
-
-        return await repository.create(dto);
+        const createdUser = await repository.create(dto);
+        const emailService = new EmailService();
+        await emailService.sendUserCreationEmail(createdUser.email);
+        return createdUser
     }
 
     async findAll(): Promise<User[]> {
