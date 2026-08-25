@@ -1,0 +1,1236 @@
+{
+  "info": {
+    "_postman_id": "c1f8a79b-8321-4f65-9f5e-2b7c4d1e8a9f",
+    "name": "Riwi Cine Backend - Colección Completa",
+    "description": "## 🎬 Riwi Cine Backend API Documentation\n\nColección oficial de endpoints de la API de **Riwi Cine Backend**. Organizada por módulos funcionales y flujos de negocio.\n\n---\n\n### ⚙️ Configuración y Variables\n* **`{{baseUrl}}`**: URL del backend (`http://localhost:3000` o `http://127.0.0.1:3000`).\n* **`{{accessToken}}`**: Token JWT de sesión obtenido automáticamente al hacer login en `POST /api/auth/login`.\n\n---\n\n### 🛡️ Autenticación\nLos endpoints protegidos requieren el header:\n```http\nAuthorization: Bearer {{accessToken}}\n```\n\n---\n\n### 📋 Módulos del Sistema\n1. **Autenticación y Seguridad (Auth & 2FA)**: Login con Bcrypt y JWT, solicitud y validación de tokens de 6 dígitos.\n2. **Usuarios y Perfil**: Registro de usuarios, listado y perfil de usuario con membresía.\n3. **Ubicación Geográfica**: Países y ciudades activas.\n4. **Películas y Cartelera**: Catálogo de películas, cartelera semanal (7 días), cartelera de hoy, filtros combinatorios y CRUD de películas.\n5. **Integración con TMDB**: Búsqueda, estrenos, populares, sincronización de géneros y películas desde The Movie Database.\n6. **Funciones y Horarios (Showtimes)**: Programación de funciones de cine por sala y película.\n7. **Asientos y Disponibilidad (Seats)**: Matriz de asientos en vivo con estados (AVAILABLE, OCCUPIED, LOCKED).\n8. **Estrenos de Películas**: Gestión de fechas de estreno y regiones.\n9. **Notificaciones de Estrenos**: Recordatorios y alertas a usuarios.\n10. **Membresías**: Creación y consulta de planes de membresía.\n11. **Servicio de Correo (Mailer)**: Envío de correos HTML a usuarios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "movieId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "showtimeId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "countryId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "tmdbId",
+      "value": "550",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Autenticación y Seguridad",
+      "description": "Endpoints para inicio de sesión, generación de token JWT con expiración configurable y verificación de códigos de 6 dígitos (2FA).",
+      "item": [
+        {
+          "name": "POST /api/auth/login - Iniciar Sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    var res = pm.response.json();",
+                  "    if (res.token) {",
+                  "        pm.environment.set(\"accessToken\", res.token);",
+                  "        pm.collectionVariables.set(\"accessToken\", res.token);",
+                  "        console.log(\"Token JWT guardado automáticamente en accessToken:\", res.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "### Descripción\nValida las credenciales (correo y contraseña). Compara la contraseña con el hash Bcrypt en BD y emite un JWT firmado válido por 30m.\n\n**Nota**: Al ejecutarse con éxito, guarda automáticamente el `token` en la variable `{{accessToken}}`."
+          },
+          "response": [
+            {
+              "name": "200 OK - Login Exitoso",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"\\u00a1Login exitoso!\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"datos\": {\n    \"id\": 1,\n    \"name\": \"Ana Garc\\u00eda\",\n    \"email\": \"ana@example.com\"\n  }\n}"
+            },
+            {
+              "name": "401 Unauthorized - Credenciales Inválidas",
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Credenciales inv\\u00e1lidas (contrase\\u00f1a incorrecta)\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /api/auth/request-token - Solicitar Código 2FA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test(\"Response time is under 2000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "pm.test(\"Response has valid JSON body\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/request-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "request-token"
+              ]
+            },
+            "description": "Genera y envía un código de verificación de 6 dígitos al correo del usuario registrado."
+          },
+          "response": [
+            {
+              "name": "200 OK - Código Enviado",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"message\": \"C\\u00f3digo de verificaci\\u00f3n enviado al correo del usuario.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST /api/auth/verify-token - Verificar Código 2FA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test(\"Response time is under 2000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "pm.test(\"Response has valid JSON body\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"token\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-token"
+              ]
+            },
+            "description": "Verifica el token de 6 dígitos ingresado por el usuario."
+          },
+          "response": [
+            {
+              "name": "200 OK - Token Válido",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"message\": \"Token validado con \\u00e9xito.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Gestión de Usuarios",
+      "description": "Endpoints para registro, consulta y perfil detallado de usuarios.",
+      "item": [
+        {
+          "name": "POST /api/users - Registrar Usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test(\"Response time is under 2000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "pm.test(\"Response has valid JSON body\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"3001234567\",\n  \"password\": \"Password123!\",\n  \"city\": \"Medellin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Crea un nuevo usuario en la base de datos con contraseña cifrada con Bcrypt."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 10,\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"3001234567\",\n  \"city\": \"Medellin\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET /api/users - Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            },
+            "description": "Devuelve el listado completo de usuarios registrados."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/users/profile/:id - Perfil y Membresía (JWT)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/profile/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "profile",
+                "{{userId}}"
+              ]
+            },
+            "description": "Devuelve los datos personales del usuario autenticado junto con el estado de su membresía, puntos y beneficios."
+          },
+          "response": [
+            {
+              "name": "200 OK - Perfil con Membresía",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": 1,\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"3001234567\",\n  \"city\": \"Medellin\",\n  \"membership\": {\n    \"active\": true,\n    \"level\": \"Gold\",\n    \"points\": 120,\n    \"membershipName\": \"Premium Cine\",\n    \"benefits\": \"2x1 los jueves y combos gratis\",\n    \"expiresAt\": \"2026-12-31T23:59:59.000Z\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Ubicación Geográfica",
+      "description": "Endpoints para consultar países y ciudades con complejos de cine activos.",
+      "item": [
+        {
+          "name": "GET /api/locations/countries - Listar Países",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/locations/countries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations",
+                "countries"
+              ]
+            },
+            "description": "Retorna todos los países registrados en la plataforma."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Colombia\"\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Per\\u00fa\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "GET /api/locations/countries/:countryId/cities - Ciudades por País",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/locations/countries/{{countryId}}/cities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "locations",
+                "countries",
+                "{{countryId}}",
+                "cities"
+              ]
+            },
+            "description": "Obtiene las ciudades activas asociadas a un país específico."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Medellin\",\n    \"countryId\": 1\n  },\n  {\n    \"id\": 2,\n    \"name\": \"Bogota\",\n    \"countryId\": 1\n  },\n  {\n    \"id\": 3,\n    \"name\": \"Cali\",\n    \"countryId\": 1\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Películas y Cartelera",
+      "description": "Endpoints para consultar la cartelera general, semanal, del día, filtros avanzados y operaciones CRUD de películas.",
+      "item": [
+        {
+          "name": "GET /api/movies - Catálogo General",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies"
+              ]
+            },
+            "description": "Retorna todas las películas locales activas con sus géneros, funciones y próximos estrenos."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/weekly - Cartelera Semanal (7 Días)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/weekly",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "weekly"
+              ]
+            },
+            "description": "Devuelve las películas que cuentan con funciones programadas para los próximos 7 días a partir de la fecha y hora actual."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/today - Cartelera del Día de Hoy",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/today",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "today"
+              ]
+            },
+            "description": "Devuelve las películas con funciones programadas para el día de hoy (entre las 00:00 y las 23:59)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/filter - Filtro Combinatorio",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/filter?date=2026-08-25&genre=Accion&classification=PG-13&language=Ingles&format=IMAX&cinemaId=1&available=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "filter"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-08-25",
+                  "description": "Fecha YYYY-MM-DD"
+                },
+                {
+                  "key": "genre",
+                  "value": "Accion",
+                  "description": "Género"
+                },
+                {
+                  "key": "classification",
+                  "value": "PG-13",
+                  "description": "Clasificación de edad"
+                },
+                {
+                  "key": "language",
+                  "value": "Ingles",
+                  "description": "Idioma original"
+                },
+                {
+                  "key": "format",
+                  "value": "IMAX",
+                  "description": "Formato: 2D, 3D, IMAX"
+                },
+                {
+                  "key": "cinemaId",
+                  "value": "1",
+                  "description": "ID de cine"
+                },
+                {
+                  "key": "available",
+                  "value": "true",
+                  "description": "Solo con asientos disponibles"
+                }
+              ]
+            },
+            "description": "Filtra la cartelera combinando criterios de fecha, género, clasificación, formato de sala, complejo y disponibilidad de sillas."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/:id - Detalle de Película",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "{{movieId}}"
+              ]
+            },
+            "description": "Obtiene la ficha técnica completa de una película por su ID local."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/movies - Crear Película Local",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Inception\",\n  \"synopsis\": \"Un ladr\\u00f3n que roba secretos corporativos mediante el uso de la tecnolog\\u00eda de compartir sue\\u00f1os.\",\n  \"duration\": 148,\n  \"posterUrl\": \"https://image.tmdb.org/t/p/w500/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg\",\n  \"trailerUrl\": \"https://www.youtube.com/watch?v=YoHD9XEInc0\",\n  \"genre\": \"Ciencia Ficci\\u00f3n\",\n  \"classification\": \"PG-13\",\n  \"director\": \"Christopher Nolan\",\n  \"language\": \"Ingl\\u00e9s\",\n  \"isSubtitled\": true,\n  \"releaseDate\": \"2010-07-16\",\n  \"rating\": 8.8,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies"
+              ]
+            },
+            "description": "Crea una película manualmente en la base de datos local."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/movies/:id - Actualizar Película",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Inception (Edici\\u00f3n Remasterizada)\",\n  \"rating\": 9.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "{{movieId}}"
+              ]
+            },
+            "description": "Actualiza la información de una película existente."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/movies/:id - Eliminar Película",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/{{movieId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "{{movieId}}"
+              ]
+            },
+            "description": "Elimina o desactiva una película local por ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Integración TMDB",
+      "description": "Endpoints para consultar catálogo mundial de películas y sincronizar directamente con The Movie Database (TMDB).",
+      "item": [
+        {
+          "name": "GET /api/movies/tmdb/popular - Películas Populares TMDB",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/tmdb/popular",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "tmdb",
+                "popular"
+              ]
+            },
+            "description": "Obtiene la lista de películas populares en tiempo real desde la API de TMDB."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/tmdb/upcoming - Próximos Estrenos TMDB",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/tmdb/upcoming",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "tmdb",
+                "upcoming"
+              ]
+            },
+            "description": "Obtiene próximos estrenos directamente de TMDB."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/tmdb/top-rated - Mejor Valoradas TMDB",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/tmdb/top-rated",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "tmdb",
+                "top-rated"
+              ]
+            },
+            "description": "Obtiene las películas con mejor puntuación histórica en TMDB."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/movies/tmdb/search - Buscar Película en TMDB",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/tmdb/search?query=Avatar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "tmdb",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "Avatar",
+                  "description": "Texto a buscar"
+                }
+              ]
+            },
+            "description": "Busca películas en TMDB por título."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/movies/tmdb/sync-genres - Sincronizar Géneros TMDB",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/tmdb/sync-genres",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "tmdb",
+                "sync-genres"
+              ]
+            },
+            "description": "Descarga e inserta el catálogo maestro de géneros de TMDB en la base de datos local."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/movies/tmdb/sync/:tmdbId - Importar Película de TMDB a BD",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/movies/tmdb/sync/{{tmdbId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "tmdb",
+                "sync",
+                "{{tmdbId}}"
+              ]
+            },
+            "description": "Importa y guarda una película desde TMDB a la BD local, incluyendo sinopsis, posters, tráilers y relaciones con géneros."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Funciones y Horarios",
+      "description": "Endpoints para gestionar la programación de funciones en salas de cine.",
+      "item": [
+        {
+          "name": "GET /api/showtimes - Listar Funciones",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes?movieId={{movieId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes"
+              ],
+              "query": [
+                {
+                  "key": "movieId",
+                  "value": "{{movieId}}",
+                  "description": "Filtrar por película"
+                },
+                {
+                  "key": "roomId",
+                  "value": "1",
+                  "description": "Filtrar por sala",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Devuelve las funciones programadas con filtros opcionales."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/showtimes/:id - Detalle de Función",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes/{{showtimeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "{{showtimeId}}"
+              ]
+            },
+            "description": "Obtiene los detalles de una función de cine por su ID."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/showtimes - Crear Función",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movieId\": 1,\n  \"roomId\": 1,\n  \"startTime\": \"2026-08-26T18:00:00.000Z\",\n  \"endTime\": \"2026-08-26T20:30:00.000Z\",\n  \"price\": 18000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes"
+              ]
+            },
+            "description": "Crea y programa una nueva función de cine."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/showtimes/:id - Actualizar Función",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 20000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes/{{showtimeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "{{showtimeId}}"
+              ]
+            },
+            "description": "Actualiza los datos de una función."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/showtimes/:id - Eliminar Función",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes/{{showtimeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "{{showtimeId}}"
+              ]
+            },
+            "description": "Elimina una función de cine programada."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/showtimes/:movieId/showtimes - Funciones por Película",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes/{{movieId}}/showtimes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "{{movieId}}",
+                "showtimes"
+              ]
+            },
+            "description": "Retorna todas las funciones activas de una película en particular."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 - Asientos y Disponibilidad",
+      "description": "Endpoints para consultar el estado en tiempo real de los asientos de una función.",
+      "item": [
+        {
+          "name": "GET /api/showtimes/:showtimeId/seats - Matriz de Asientos de Función",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/showtimes/{{showtimeId}}/seats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "{{showtimeId}}",
+                "seats"
+              ]
+            },
+            "description": "Obtiene la matriz de asientos completa de la sala asignada a la función, con su respectivo estado en tiempo real (AVAILABLE, OCCUPIED, LOCKED)."
+          },
+          "response": [
+            {
+              "name": "200 OK - Matriz de Asientos",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "[\n  {\n    \"id\": 1,\n    \"row\": \"A\",\n    \"number\": 1,\n    \"status\": \"AVAILABLE\",\n    \"type\": \"STANDARD\"\n  },\n  {\n    \"id\": 2,\n    \"row\": \"A\",\n    \"number\": 2,\n    \"status\": \"OCCUPIED\",\n    \"type\": \"STANDARD\"\n  },\n  {\n    \"id\": 3,\n    \"row\": \"A\",\n    \"number\": 3,\n    \"status\": \"LOCKED\",\n    \"type\": \"VIP\"\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 - Estrenos de Películas",
+      "description": "Endpoints para programar y consultar fechas de próximos estrenos.",
+      "item": [
+        {
+          "name": "GET /api/releases - Listar Estrenos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/releases",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "releases"
+              ]
+            },
+            "description": "Obtiene la lista de fechas de estreno programadas."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/releases/:id - Detalle de Estreno",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/releases/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "releases",
+                "1"
+              ]
+            },
+            "description": "Obtiene la información de un estreno por ID."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/releases - Registrar Estreno",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movieId\": 1,\n  \"releaseDate\": \"2026-11-20\",\n  \"region\": \"LATAM\",\n  \"releaseType\": \"THEATRICAL\",\n  \"notes\": \"Estreno de medianoche confirmado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/releases",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "releases"
+              ]
+            },
+            "description": "Registra una fecha de estreno oficial para una película."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/releases/:id - Actualizar Estreno",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"releaseDate\": \"2026-11-25\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/releases/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "releases",
+                "1"
+              ]
+            },
+            "description": "Actualiza la fecha o datos de un estreno."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/releases/:id - Eliminar Estreno",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/releases/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "releases",
+                "1"
+              ]
+            },
+            "description": "Elimina un registro de estreno."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 - Notificaciones de Estrenos",
+      "description": "Endpoints para gestionar alertas automáticas a usuarios sobre películas próximas a estrenarse.",
+      "item": [
+        {
+          "name": "GET /api/notifications - Listar Notificaciones",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            },
+            "description": "Obtiene la lista de notificaciones programadas."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/notifications - Programar Notificación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"movieId\": 1,\n  \"notificationDate\": \"2026-11-19T09:00:00.000Z\",\n  \"channel\": \"EMAIL\",\n  \"message\": \"\\u00a1Tu pel\\u00edcula esperada se estrena ma\\u00f1ana! Compra tus boletos ya.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            },
+            "description": "Programa una alerta personalizada para un usuario."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/notifications/:id - Cancelar Notificación",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "1"
+              ]
+            },
+            "description": "Cancela o elimina una notificación programada."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 - Membresías",
+      "description": "Endpoints para la creación y gestión de planes de suscripción y fidelización.",
+      "item": [
+        {
+          "name": "POST /api/membership/create - Crear Membresía",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plan Gold Multicine\",\n  \"price\": 45000,\n  \"durationDays\": 30,\n  \"description\": \"Entradas 2x1 los jueves, descuentos en confiter\\u00eda y acceso prioritario a preventas.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/membership/create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membership",
+                "create"
+              ]
+            },
+            "description": "Crea un nuevo tipo de membresía."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/membership - Listar Membresías",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/membership",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membership"
+              ]
+            },
+            "description": "Obtiene la lista de todas las membresías activas."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11 - Servicio de Correo Electrónico",
+      "description": "Endpoints para el envío de notificaciones y correos transaccionales con plantillas HTML.",
+      "item": [
+        {
+          "name": "POST /api/mail/email - Enviar Correo HTML",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"subject\": \"\\u00a1Confirmaci\\u00f3n de Boletos de Cine!\",\n  \"html\": \"<h1>\\u00a1Gracias por tu compra!</h1><p>Tus boletos para Spider-Man han sido confirmados.</p>\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/mail/email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mail",
+                "email"
+              ]
+            },
+            "description": "Envía un correo con formato HTML al email asociado al usuario especificado por `userId`."
+          },
+          "response": [
+            {
+              "name": "200 OK - Correo Enviado",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"message\": \"Correo enviado correctamente\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

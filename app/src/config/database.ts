@@ -25,8 +25,12 @@ import UpcomingNotification from "../models/upcoming-notification.model";
 import Seat from "../models/seat.model";
 import SeatLock from "../models/seat-lock.model";
 import Ticket from "../models/ticket.model";
+import Transfer from "../models/transfer.model";
+import ShowtimeChange from "../models/showtime-change.model";
 import Cart from "../models/cart.model";
 import CartTicket from "../models/cart-ticket.model";
+import CartSnack from "../models/cart-snack.model";
+import Order from "../models/order.model";
 // FCB - Modificado: Importación de modelos geográficos (HU-002)
 import Country from "../models/country.model";
 import City from "../models/city.model";
@@ -58,8 +62,12 @@ const sequelize = new Sequelize(
       Seat,
       SeatLock,
       Ticket,
+      Transfer,
+      ShowtimeChange,
       Cart,
       CartTicket,
+      CartSnack,
+      Order,
     ],
   }
 );
