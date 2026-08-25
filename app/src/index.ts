@@ -13,7 +13,7 @@ dotenv.config();
 import app from "./server";
 import sequelize from "./config/database";
 
-const PORT = process.env.APP_PORT || 3001;
+const PORT = process.env.APP_PORT || 3000;
 
 const start = async () => {
   try {
