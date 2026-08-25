@@ -4,7 +4,7 @@ import { IEmailService, SendEmailDto } from './interfaces/email.service.interfac
 export class EmailService implements IEmailService {
   async send(options: SendEmailDto): Promise<void> {
     const mailOptions = {
-      from: `"Tu Aplicación" <${process.env.SMTP_USER}>`,
+      from: `"Aplicación" <${process.env.SMTP_USER}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,

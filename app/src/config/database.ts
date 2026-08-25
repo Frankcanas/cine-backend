@@ -22,6 +22,11 @@ import Genre from "../models/genre.model";
 import MovieGenre from "../models/movie-genre.model";
 import MovieRelease from "../models/movie-release.model";
 import UpcomingNotification from "../models/upcoming-notification.model";
+import Seat from "../models/seat.model";
+import SeatLock from "../models/seat-lock.model";
+import Ticket from "../models/ticket.model";
+import Cart from "../models/cart.model";
+import CartTicket from "../models/cart-ticket.model";
 // FCB - Modificado: Importación de modelos geográficos (HU-002)
 import Country from "../models/country.model";
 import City from "../models/city.model";
@@ -50,6 +55,11 @@ const sequelize = new Sequelize(
       UpcomingNotification,
       Country,
       City,
+      Seat,
+      SeatLock,
+      Ticket,
+      Cart,
+      CartTicket,
     ],
   }
 );
