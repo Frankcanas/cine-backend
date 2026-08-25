@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.model';
-import { comparePassword } from '../utils/password';
+import { Router } from 'express';
+import { loginUser } from '../services/auth.services';
+import { AuthController } from '../controllers/token.controller';
 
 const router = Router();
+const authController = new AuthController();
 
 /**
  * @swagger
@@ -50,52 +50,45 @@ const router = Router();
  *       500:
  *         description: Error interno del servidor
  */
+router.post('/login', loginUser);
 
-router.post('/login', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Correo y contraseña son requeridos' });
-    }
-
-    try {
-        const user = await User.findOne({ where: { email: email } });
-
-        if (!user) {
-            return res.status(401).json({ message: 'Credenciales inválidas (usuario no encontrado)' });
-        }
-
-        const passwordMatches = await comparePassword(password, user.password);
-
-        if (!passwordMatches) {
-            return res.status(401).json({ message: 'Credenciales inválidas (contraseña incorrecta)' });
-        }
-
-        const payload = {
-            userId: user.id,
-            email: user.email,
-        }
-
-        const token = jwt.sign(
-            payload,
-            String(process.env.JWT_SECRET),
-            { expiresIn: (process.env.JWT_EXPIRES_IN || '30m') as any }
-        );
-
-        return res.status(200).json({
-            message: '¡Login exitoso!',
-            token,
-            datos: {
-                id: user.id,
-                name: user.name,
-                email: user.email
-            }
-        });
-
-    } catch (error) {
-        return res.status(500).json({ message: 'Error interno del servidor', error });
-    }
-});
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Restablecer la contraseña usando un token enviado por correo
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "usuario@correo.com"
+ *               token:
+ *                 type: string
+ *                 example: "123456"
+ *               newPassword:
+ *                 type: string
+ *                 example: "NuevaPass123!"
+ *     responses:
+ *       200:
+ *         description: Contraseña actualizada correctamente
+ *       400:
+ *         description: Falta información, token inválido o contraseña inválida
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.post('/reset-password', authController.handleResetPassword);
 
 export default router;
 
