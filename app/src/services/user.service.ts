@@ -72,6 +72,14 @@ class UserService implements IUserService {
 
         const createdUser = await repository.create(userData);
 
+        // Envío de correo de bienvenida
+        try {
+            const emailService = new EmailService();
+            await emailService.sendUserCreationEmail(createdUser.email);
+        } catch (error) {
+            console.error("Error al enviar correo de bienvenida:", error);
+        }
+
         // Generar token de verificación de correo por 24 horas (HU-006)
         try {
             await this.tokenService.requestVerificationToken(createdUser.id, createdUser.email);
