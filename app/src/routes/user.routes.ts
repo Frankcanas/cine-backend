@@ -13,7 +13,7 @@
  */
 
 import { Router } from "express";
-import { createUser, getUsers, getProfile } from "../controllers/user.controller";
+import { createUser, getUsers, getProfile, updateProfile } from "../controllers/user.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 
 const router = Router();
@@ -147,42 +147,82 @@ router.get("/", getUsers);
  * Requiere el header `Authorization: Bearer <token>` con un JWT válido
  * obtenido en `POST /api/auth/login`.
  *
- *
+ /**
  * @swagger
- * /api/users/profile/{id}:
+ * /api/users/profile:
  *   get:
- *     summary: Obtener el perfil de un usuario por ID
+ *     summary: Obtener el perfil del usuario autenticado
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Perfil obtenido exitosamente
- *         content:
- *           application/json:
- *             example:
- *               id: 3
- *               name: "John Doe"
- *               email: "john.doe@example.com"
- *               phoneNumber: "123456789"
- *               city: "New York"
- *               membership:
- *                 active: true
- *                 level: "Gold"
- *                 points: 120
- *                 membershipName: "Premium"
- *                 benefits: "Acceso a estrenos anticipados"
- *                 expiresAt: "2026-09-18T00:00:00.000Z"
- *       401:
- *         description: Token no proporcionado, inválido o expirado
- *       404:
- *         description: Usuario no encontrado
- *       500:
- *         description: Error interno del servidor
+ *   put:
+ *     summary: Actualizar datos personales del usuario autenticado
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Perfil actualizado correctamente
  */
+router.get("/profile", authenticateJWT, getProfile);
+router.put("/profile", authenticateJWT, updateProfile);
 
-router.get("/profile/:id", authenticateJWT, getProfile);
+/**
+ * @swagger
+ * /api/users/profile/{id}:
+ *   get:
+ *     summary: Obtener el perfil de un usuario por ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Perfil obtenido exitosamente
+ *   put:
+ *     summary: Actualizar perfil de un usuario por ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Perfil actualizado correctamente
+ */
+router.get("/profile/:id", getProfile);
+router.put("/profile/:id", updateProfile);
 
 export default router;
-
-

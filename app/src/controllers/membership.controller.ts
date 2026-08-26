@@ -31,3 +31,23 @@ export const getAllMemberships = async (req: Request, res: Response): Promise<Re
         });
     }
 };
+
+export const getBenefits = async (_req: Request, res: Response): Promise<Response> => {
+    try {
+        const memberships = await membreshipService.getAll();
+        const benefitsCatalog = memberships.map((m: any) => ({
+            id: m.id,
+            name: m.name,
+            level: m.level,
+            discountPercentage: m.discountPercentage || 0,
+            pointsMultiplier: m.pointsPerPurchase || 10,
+            benefits: m.description,
+            validityDays: m.durationDays,
+        }));
+        return res.status(200).json(benefitsCatalog);
+    } catch (error: any) {
+        return res.status(500).json({
+            error: error.message,
+        });
+    }
+};

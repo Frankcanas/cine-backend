@@ -118,8 +118,11 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
         // Delega la lógica de negocio al servicio.
         const user = await userService.create(dto);
 
-        // Retorna el recurso creado.
-        return res.status(201).json(user);
+        // Retorna el recurso creado sin exponer el hash de la contraseña
+        const userJson = user.toJSON ? user.toJSON() : { ...user };
+        delete (userJson as any).password;
+
+        return res.status(201).json(userJson);
 
     } catch (error: any) {
 
@@ -164,16 +167,6 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
  *
  * - **500 Internal Server Error**
  *   Error inesperado durante la consulta.
- *
- * @example
- * [
- *   {
- *     "id": 1,
- *     "name": "David",
- *     "email": "david@example.com"
- *     "password": ******
- *   }
- * ]
  */
 export const getUsers = async (_req: Request, res: Response): Promise<Response> => {
 
@@ -182,8 +175,14 @@ export const getUsers = async (_req: Request, res: Response): Promise<Response> 
         // Solicita la información al servicio.
         const users = await userService.findAll();
 
-        // Retorna la colección de usuarios.
-        return res.status(200).json(users);
+        const sanitizedUsers = users.map((u: any) => {
+            const json = u.toJSON ? u.toJSON() : { ...u };
+            delete json.password;
+            return json;
+        });
+
+        // Retorna la colección de usuarios sanitizada.
+        return res.status(200).json(sanitizedUsers);
 
     } catch (error: any) {
 
@@ -195,10 +194,12 @@ export const getUsers = async (_req: Request, res: Response): Promise<Response> 
 };
 
 export const getProfile = async (req: Request, res: Response): Promise<Response> => {
-
     try {
+        const userId = Number((req as any).userId || req.params.id);
 
-        const userId = Number(req.userId);
+        if (!userId) {
+            return res.status(400).json({ error: "userId no proporcionado" });
+        }
 
         const profile = await userService.getProfile(userId);
 
@@ -211,10 +212,34 @@ export const getProfile = async (req: Request, res: Response): Promise<Response>
         return res.status(200).json(profile);
 
     } catch (error: any) {
-
         return res.status(500).json({
             error: error.message
         });
+    }
+};
 
+export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const userId = Number((req as any).userId || req.params.id || req.body.userId);
+
+        if (!userId) {
+            return res.status(400).json({ error: "userId no proporcionado" });
+        }
+
+        const updated = await userService.updateProfile(userId, req.body);
+
+        if (!updated) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        const json = updated.toJSON ? updated.toJSON() : { ...updated };
+        delete (json as any).password;
+
+        return res.status(200).json({
+            message: "Perfil actualizado correctamente",
+            user: json,
+        });
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message });
     }
 };

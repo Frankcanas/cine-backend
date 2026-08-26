@@ -5,6 +5,8 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./docs/swagger";
 
+import helmet from "helmet";
+
 import userRoutes from "./routes/user.routes";
 import membershipRoutes from "./routes/membership.routes";
 import authRoutes from "./routes/auth.routes";
@@ -15,13 +17,26 @@ import upcomingNotificationRoutes from "./routes/upcoming-notification.routes";
 import tokenRoutes from "./routes/token.routes";
 import emailRoutes from "./routes/email.routes";
 import locationRoutes from "./routes/location.routes";
+import seatRoutes from "./routes/seat.routes";
+import healthRoutes from "./routes/health.routes";
 
 const app = express();
+
+// Seguridad de Cabeceras HTTP (HU-001)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 
 // Habilitar CORS para permitir peticiones desde cualquier origen (Swagger UI, Frontend, etc.)
 app.use(cors());
 
 app.use(express.json());
+
+// Health Check (HU-001)
+app.use("/api/v1", healthRoutes);
 
 // Rutas
 app.use("/api/users", userRoutes);
@@ -31,6 +46,8 @@ app.use("/api/mail", emailRoutes);
 app.use("/api/membership", membershipRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/showtimes", showtimeRoutes);
+app.use("/api/showtimes", seatRoutes);
+app.use("/api/reservations", seatRoutes);
 app.use("/api/releases", movieReleaseRoutes);
 app.use("/api/notifications", upcomingNotificationRoutes);
 // FCB - Modificado: Se montaron las rutas de ubicaciones (HU-002)

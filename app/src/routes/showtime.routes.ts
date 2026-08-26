@@ -1,4 +1,3 @@
-// app/src/routes/showtime.routes.ts
 import { Router } from "express";
 import {
   getShowtimes,
@@ -7,6 +6,7 @@ import {
   updateShowtime,
   deleteShowtime,
   getShowtimesByMovieId,
+  getShowtimePrices,
 } from "../controllers/showtime.controller";
 
 const router = Router();
@@ -53,6 +53,32 @@ router.get("/", getShowtimes);
  *         description: Función no encontrada
  */
 router.get("/:id", getShowtimeById);
+
+/**
+ * @swagger
+ * /api/showtimes/{id}/prices:
+ *   get:
+ *     summary: Obtener el desglose de precios y tarifas dinámicas para una función
+ *     tags: [Showtimes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: membershipLevel
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Nivel de membresía del cliente para cálculo de descuentos
+ *     responses:
+ *       200:
+ *         description: Tarifas dinámicas calculadas por tipo de boleto y descuentos
+ *       404:
+ *         description: Función no encontrada
+ */
+router.get("/:id/prices", getShowtimePrices);
 
 /**
  * @swagger

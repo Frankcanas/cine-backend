@@ -17,6 +17,14 @@ export interface UserAttributes {
   membershipId?: number;
   points?: number;
   membershipStartDate?: Date;
+  membershipCode?: string;
+  isActive?: boolean;
+  isVerified?: boolean;
+  failedLoginAttempts?: number;
+  lockoutUntil?: Date | null;
+  refreshToken?: string | null;
+  resetPasswordToken?: string | null;
+  resetPasswordExpires?: Date | null;
 }
 
 /**
@@ -92,10 +100,60 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   })
   membershipStartDate?: Date;
 
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+    unique: true,
+  })
+  membershipCode?: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isActive!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isVerified!: boolean;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  failedLoginAttempts!: number;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  lockoutUntil?: Date | null;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  refreshToken?: string | null;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  resetPasswordToken?: string | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  resetPasswordExpires?: Date | null;
 
   @HasMany(() => UpcomingNotification)
   notifications?: UpcomingNotification[];
 }
-
 
 export default User;

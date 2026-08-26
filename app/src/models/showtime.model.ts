@@ -12,6 +12,7 @@ export interface ShowtimeAttributes {
   endTime: Date;
   price: number;
   language?: string;
+  audioType?: string;
   format?: string;
   availableSeats?: number;
   status?: string;
@@ -73,6 +74,13 @@ export class Showtime extends Model {
     defaultValue: "Español",
   })
   language?: string;
+
+  @Column({
+    type: DataType.STRING(30),
+    allowNull: true,
+    defaultValue: "DOBLADA",
+  })
+  audioType?: string;
 
   @Column({
     type: DataType.STRING(30),

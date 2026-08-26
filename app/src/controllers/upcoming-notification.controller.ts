@@ -10,7 +10,8 @@ export const createNotification = async (req: Request, res: Response): Promise<R
     const notification = await service.create(req.body);
     return res.status(201).json(notification);
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    const status = error.statusCode || 500;
+    return res.status(status).json({ error: error.message });
   }
 };
 

@@ -6,6 +6,8 @@ import {
   getTodayMovies,
   filterMovies,
   getMovieById,
+  getMovieFunctions,
+  getMovieRecommendations,
   createMovie,
   updateMovie,
   deleteMovie,
@@ -582,6 +584,44 @@ router.get("/filter", filterMovies);
  *         description: Película no encontrada
  */
 router.get("/:id", getMovieById);
+
+/**
+ * @swagger
+ * /api/movies/{id}/functions:
+ *   get:
+ *     summary: Obtener todas las funciones activas de una película
+ *     tags: [Movies]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de funciones con salas, complejos y ciudades
+ *       404:
+ *         description: Película no encontrada
+ */
+router.get("/:id/functions", getMovieFunctions);
+
+/**
+ * @swagger
+ * /api/movies/{id}/recommendations:
+ *   get:
+ *     summary: Obtener recomendaciones de películas similares
+ *     tags: [Movies]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de películas recomendadas
+ */
+router.get("/:id/recommendations", getMovieRecommendations);
 
 /**
  * @swagger

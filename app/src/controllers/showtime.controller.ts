@@ -90,5 +90,17 @@ export const getShowtimesByMovieId = async (req: Request, res: Response): Promis
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
-  };
+};
+
+export const getShowtimePrices = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+    const membershipLevel = Number(req.query.membershipLevel) || 1;
+    const prices = await showtimeService.getShowtimePrices(id, membershipLevel);
+    return res.status(200).json(prices);
+  } catch (error: any) {
+    const status = error.statusCode || 500;
+    return res.status(status).json({ error: error.message });
+  }
+};
 
