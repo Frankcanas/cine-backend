@@ -18,7 +18,8 @@ import tokenRoutes from "./routes/token.routes";
 import emailRoutes from "./routes/email.routes";
 import locationRoutes from "./routes/location.routes";
 import marketingEmailRoutes from "./routes/marketing-email.routes";
-
+import healthRoutes from "./routes/health.routes"
+import seatRoutes from "./routes/seat.routes"
 const app = express();
 
 // Seguridad de Cabeceras HTTP (HU-001)
