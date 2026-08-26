@@ -84,6 +84,7 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
 
         // Construcción del DTO recibido desde el cliente.
         const dto: CreateUserDto = req.body;
+        dto.notificationPreference = dto.notificationPreference ?? dto.preferenciaNotificaciones ?? true;
 
         // Validación para que el correo escrito tenga por lo menos un arroba.
         if (!dto.email || !dto.email.includes('@')) {

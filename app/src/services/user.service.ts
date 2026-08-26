@@ -33,6 +33,8 @@ class UserService implements IUserService {
     }
 
     async create(dto: CreateUserDto): Promise<User> {
+        dto.notificationPreference = dto.notificationPreference ?? dto.preferenciaNotificaciones ?? true;
+
         const passwordStatus: PasswordValidationDto = validatePassword(dto.password);
         if (!passwordStatus.isValid) {
             const message = 'La contraseña debe tener mayúscula, minúscula, número, carácter especial y 10 o más caracteres.';
@@ -114,6 +116,7 @@ class UserService implements IUserService {
             email: user.email,
             phoneNumber: user.phoneNumber,
             city: user.city,
+            notificationPreference: user.notificationPreference ?? true,
             membership: {
                 active,
                 level: membership?.level || null,

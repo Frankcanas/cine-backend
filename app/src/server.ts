@@ -17,8 +17,7 @@ import upcomingNotificationRoutes from "./routes/upcoming-notification.routes";
 import tokenRoutes from "./routes/token.routes";
 import emailRoutes from "./routes/email.routes";
 import locationRoutes from "./routes/location.routes";
-import seatRoutes from "./routes/seat.routes";
-import healthRoutes from "./routes/health.routes";
+import marketingEmailRoutes from "./routes/marketing-email.routes";
 
 const app = express();
 
@@ -52,6 +51,7 @@ app.use("/api/releases", movieReleaseRoutes);
 app.use("/api/notifications", upcomingNotificationRoutes);
 // FCB - Modificado: Se montaron las rutas de ubicaciones (HU-002)
 app.use("/api/locations", locationRoutes);
+app.use("/api/marketing", marketingEmailRoutes);
 
 // Swagger JSON endpoint
 app.get("/api/docs.json", (_req, res) => {

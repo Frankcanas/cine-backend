@@ -14,6 +14,7 @@ export interface UserAttributes {
   phoneNumber: string;
   password: string;
   city?: string;
+  notificationPreference?: boolean;
   membershipId?: number;
   points?: number;
   membershipStartDate?: Date;
@@ -76,6 +77,13 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     allowNull: true,
   })
   city?: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  notificationPreference!: boolean;
 
   @ForeignKey(() => Membership)
   @Column({

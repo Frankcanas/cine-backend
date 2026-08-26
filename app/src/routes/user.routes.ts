@@ -50,6 +50,7 @@ const router = Router();
  *               - phoneNumber
  *               - password
  *               - city
+ *               - notificationPreference
  *              
  *             properties:
  *               name:
@@ -67,6 +68,10 @@ const router = Router();
  *               city:   
  *                type: string
  *                example: "New York"
+ *               notificationPreference:
+ *                 type: boolean
+ *                 description: "Indica si el usuario acepta recibir notificaciones comerciales por correo."
+ *                 example: true
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
@@ -79,6 +84,7 @@ const router = Router();
  *               phoneNumber: "123456789"
  *               password: "*****"
  *               city: "New York"
+ *               notificationPreference: true
  *       400:
  *         description: Datos inválidos
  *         content:
@@ -158,26 +164,28 @@ router.get("/", getUsers);
  *     responses:
  *       200:
  *         description: Perfil obtenido exitosamente
- *   put:
- *     summary: Actualizar datos personales del usuario autenticado
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               phoneNumber:
- *                 type: string
- *               city:
- *                 type: string
- *     responses:
- *       200:
- *         description: Perfil actualizado correctamente
+ *         content:
+ *           application/json:
+ *             example:
+ *               id: 3
+ *               name: "John Doe"
+ *               email: "john.doe@example.com"
+ *               phoneNumber: "123456789"
+ *               city: "New York"
+ *               notificationPreference: true
+ *               membership:
+ *                 active: true
+ *                 level: "Gold"
+ *                 points: 120
+ *                 membershipName: "Premium"
+ *                 benefits: "Acceso a estrenos anticipados"
+ *                 expiresAt: "2026-09-18T00:00:00.000Z"
+ *       401:
+ *         description: Token no proporcionado, inválido o expirado
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
  */
 router.get("/profile", authenticateJWT, getProfile);
 router.put("/profile", authenticateJWT, updateProfile);
