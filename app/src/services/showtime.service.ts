@@ -31,6 +31,10 @@ export class ShowtimeService {
     return await this.showtimeRepository.findById(id);
   }
 
+  async getShowtimeDetail(id: number): Promise<any | null> {
+    return await (this.showtimeRepository as any).findByIdWithAvailability(id);
+  }
+
   async getShowtimesByMovie(movieId: number): Promise<Showtime[]> {
     return await this.showtimeRepository.findByMovieId(movieId);
   }
@@ -55,8 +59,15 @@ export class ShowtimeService {
     const affected = await this.showtimeRepository.delete(id);
     return affected > 0;
   }
-  async getShowtimesForMovie(movieId: number, filters: ShowtimeFilterDto): Promise<Showtime[]> {
+  async getShowtimesForMovie(movieId: number, filters: ShowtimeFilterDto): Promise<any[]> {
     return await this.showtimeRepository.findByMovieWithFilters(movieId, filters);
+  }
+
+  async getShowtimesForMoviePaginated(
+    movieId: number,
+    filters: ShowtimeFilterDto
+  ): Promise<{ data: any[]; total: number; page: number; totalPages: number }> {
+    return await this.showtimeRepository.findByMovieWithFiltersPaginated(movieId, filters);
   }
 
   async getShowtimePrices(showtimeId: number, membershipLevel: number = 1): Promise<any> {

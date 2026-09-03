@@ -1,32 +1,8 @@
 import { Router } from "express";
-import {
-  getSeatsByShowtimeId,
-  lockSeats,
-  releaseSeats,
-  getReservationsSummary,
-} from "../controllers/seat.controller";
+import { authenticateJWT } from "../middlewares/auth.middleware";
+import { lockSeats, releaseSeats, releaseSingleSeatLock, getReservationsSummary } from "../controllers/seat.controller";
 
 const router = Router();
-
-/**
- * @swagger
- * /api/showtimes/{showtimeId}/seats:
- *   get:
- *     summary: Obtener la matriz de asientos de una función con su estado actual (AVAILABLE, OCCUPIED, LOCKED)
- *     tags: [Seats & Reservations]
- *     parameters:
- *       - in: path
- *         name: showtimeId
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Lista de asientos con su estado
- *       404:
- *         description: Función no encontrada
- */
-router.get("/:showtimeId/seats", getSeatsByShowtimeId);
 
 /**
  * @swagger
@@ -34,6 +10,8 @@ router.get("/:showtimeId/seats", getSeatsByShowtimeId);
  *   post:
  *     summary: Bloquear temporalmente sillas para una función (10 minutos de expiración)
  *     tags: [Seats & Reservations]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -43,7 +21,6 @@ router.get("/:showtimeId/seats", getSeatsByShowtimeId);
  *             required:
  *               - showtimeId
  *               - seatIds
- *               - userId
  *             properties:
  *               showtimeId:
  *                 type: integer
@@ -53,19 +30,39 @@ router.get("/:showtimeId/seats", getSeatsByShowtimeId);
  *                 items:
  *                   type: integer
  *                 example: [1, 2]
- *               userId:
- *                 type: integer
- *                 example: 1
  *               durationMinutes:
  *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 15
  *                 default: 10
+ *                 description: Duración del bloqueo en minutos (1-15)
  *     responses:
  *       200:
  *         description: Sillas bloqueadas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 lockedSeats:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                 expiresAt:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Parámetros inválidos o durationMinutes fuera de rango
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Función o asiento no encontrado
  *       409:
  *         description: Sillas ya ocupadas o bloqueadas por otro usuario
  */
-router.post("/lock-seats", lockSeats);
+router.post("/lock-seats", authenticateJWT, lockSeats);
 
 /**
  * @swagger
@@ -99,7 +96,36 @@ router.post("/lock-seats", lockSeats);
  *       200:
  *         description: Sillas liberadas correctamente
  */
-router.delete("/release-seats", releaseSeats);
+router.delete("/release-seats", authenticateJWT, releaseSeats);
+
+/**
+ * @swagger
+ * /reservations/{showtimeId}/seats/{seatId}/lock:
+ *   delete:
+ *     summary: Liberar un asiento bloqueado (HU-010 contrato literal - alias bulk)
+ *     tags: [Seats & Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: showtimeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: seatId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Bloqueo liberado correctamente
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Función no encontrada
+ */
+router.delete("/:showtimeId/seats/:seatId/lock", authenticateJWT, releaseSingleSeatLock);
 
 /**
  * @swagger
@@ -117,6 +143,6 @@ router.delete("/release-seats", releaseSeats);
  *       200:
  *         description: Lista de bloqueos activos del usuario
  */
-router.get("/summary", getReservationsSummary);
+router.get("/summary", authenticateJWT, getReservationsSummary);
 
 export default router;

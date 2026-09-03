@@ -6,7 +6,6 @@ import {
   getTodayMovies,
   filterMovies,
   getMovieById,
-  getMovieFunctions,
   getMovieRecommendations,
   createMovie,
   updateMovie,
@@ -18,6 +17,7 @@ import {
   syncMovieWithTmdb,
   syncGenresFromTmdb,
 } from "../controllers/movie.controller";
+import { getShowtimesByMovieId } from "../controllers/showtime.controller";
 
 const router = Router();
 
@@ -567,6 +567,66 @@ router.get("/filter", filterMovies);
 
 /**
  * @swagger
+ * /movies/{id}/functions:
+ *   get:
+ *     summary: Funciones de una película con filtros (HU-009) — fecha, complejo, sala, formato, idioma, audio, disponibilidad real
+ *     tags: [Functions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: format
+ *         schema: { type: string, enum: [2D, 3D, IMAX, 4DX, VIP] }
+ *         description: Formato 2D/3D/IMAX/4DX/VIP
+ *       - in: query
+ *         name: language
+ *         schema: { type: string, enum: [Español, Inglés, Doblada, Subtitulada] }
+ *         description: Idioma
+ *       - in: query
+ *         name: audioType
+ *         schema: { type: string, enum: [DOBLADA, SUBTITULADA] }
+ *         description: Tipo audio doblada/subtitulada
+ *       - in: query
+ *         name: fecha
+ *         schema: { type: string, format: date, example: "2026-09-03" }
+ *         description: Fecha YYYY-MM-DD
+ *       - in: query
+ *         name: cinemaId
+ *         schema: { type: integer }
+ *         description: Complejo de cine
+ *       - in: query
+ *         name: roomId
+ *         schema: { type: integer }
+ *         description: Sala
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, minimum: 1, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+ *     responses:
+ *       200:
+ *         description: Lista paginada con sala y disponibilidad (RN-035/036)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data: { type: array, items: { type: object } }
+ *                 total: { type: integer }
+ *                 page: { type: integer }
+ *                 totalPages: { type: integer }
+ *       400:
+ *         description: Parámetros inválidos
+ *       404:
+ *         description: Película no encontrada
+ */
+router.get("/:id/functions", getShowtimesByMovieId);
+
+/**
+ * @swagger
  * /api/movies/{id}:
  *   get:
  *     summary: Obtener una película por ID local con sus asociaciones
@@ -584,26 +644,6 @@ router.get("/filter", filterMovies);
  *         description: Película no encontrada
  */
 router.get("/:id", getMovieById);
-
-/**
- * @swagger
- * /api/movies/{id}/functions:
- *   get:
- *     summary: Obtener todas las funciones activas de una película
- *     tags: [Movies]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Lista de funciones con salas, complejos y ciudades
- *       404:
- *         description: Película no encontrada
- */
-router.get("/:id/functions", getMovieFunctions);
 
 /**
  * @swagger

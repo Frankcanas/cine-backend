@@ -11,7 +11,7 @@ import userRoutes from "./routes/user.routes";
 import membershipRoutes from "./routes/membership.routes";
 import authRoutes from "./routes/auth.routes";
 import movieRoutes from "./routes/movie.routes";
-import showtimeRoutes from "./routes/showtime.routes";
+import functionsRoutes from "./routes/functions.routes";
 import movieReleaseRoutes from "./routes/movie-release.routes";
 import upcomingNotificationRoutes from "./routes/upcoming-notification.routes";
 import tokenRoutes from "./routes/token.routes";
@@ -38,16 +38,15 @@ app.use(express.json());
 // Health Check (HU-001)
 app.use("/api/v1", healthRoutes);
 
-// Rutas
+// Rutas — HU-009/HU-010 con paths exactos sin /api (spec oficial)
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", tokenRoutes);
 app.use("/api/mail", emailRoutes);
 app.use("/api/membership", membershipRoutes);
-app.use("/api/movies", movieRoutes);
-app.use("/api/showtimes", showtimeRoutes);
-app.use("/api/showtimes", seatRoutes);
-app.use("/api/reservations", seatRoutes);
+app.use("/movies", movieRoutes);
+app.use("/functions", functionsRoutes);
+app.use("/reservations", seatRoutes);
 app.use("/api/releases", movieReleaseRoutes);
 app.use("/api/notifications", upcomingNotificationRoutes);
 // FCB - Modificado: Se montaron las rutas de ubicaciones (HU-002)
