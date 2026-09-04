@@ -10,6 +10,8 @@ export interface MembershipAttributes {
   durationDays: number;
   description?: string;
   level?: string;
+  discountPercentage?: number;
+  pointsPerPurchase?: number;
 }
 
 @Table({
@@ -53,6 +55,20 @@ export class Membership extends Model {
     allowNull: true,
   })
   level?: string;
+
+  @Column({
+    type: DataType.DECIMAL(5, 2),
+    allowNull: false,
+    defaultValue: 0,
+  })
+  discountPercentage!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 10,
+  })
+  pointsPerPurchase!: number;
 
   @HasMany(() => User)
   users?: User[];

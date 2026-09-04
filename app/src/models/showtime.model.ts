@@ -12,14 +12,25 @@ export interface ShowtimeAttributes {
   endTime: Date;
   price: number;
   language?: string;
+  audioType?: string;
   format?: string;
   availableSeats?: number;
   status?: string;
+  maxSeatsPerReservation?: number;
 }
 
 @Table({
   tableName: "showtimes",
   timestamps: true,
+  indexes: [
+    { fields: ["movieId"], name: "idx_showtimes_movie" },
+    { fields: ["format"], name: "idx_showtimes_format" },
+    { fields: ["language"], name: "idx_showtimes_language" },
+    { fields: ["audioType"], name: "idx_showtimes_audiotype" },
+    { fields: ["startTime"], name: "idx_showtimes_starttime" },
+    { fields: ["status"], name: "idx_showtimes_status" },
+    { fields: ["roomId"], name: "idx_showtimes_room" },
+  ],
 })
 export class Showtime extends Model {
   @Column({
@@ -77,6 +88,13 @@ export class Showtime extends Model {
   @Column({
     type: DataType.STRING(30),
     allowNull: true,
+    defaultValue: "DOBLADA",
+  })
+  audioType?: string;
+
+  @Column({
+    type: DataType.STRING(30),
+    allowNull: true,
     defaultValue: "2D",
   })
   format?: string;
@@ -93,6 +111,14 @@ export class Showtime extends Model {
     defaultValue: "AVAILABLE",
   })
   status!: string;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 6,
+    field: "max_seats_per_reservation",
+  })
+  maxSeatsPerReservation!: number;
 }
 
 export type ShowtimeCreationAttributes = Partial<ShowtimeAttributes>;

@@ -22,5 +22,6 @@ export interface UserProfileDto {
   email: string;
   phoneNumber: string;
   city?: string;
+  notificationPreference: boolean;
   membership: MembershipStatusDto;
 }

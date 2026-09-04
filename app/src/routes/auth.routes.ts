@@ -1,19 +1,13 @@
-import { Router } from 'express';
-import { loginUser } from '../services/auth.services';
-import { AuthController } from '../controllers/token.controller';
+import { Router } from "express";
+import { login, refresh, logout, forgotPassword, resetPassword } from "../controllers/auth.controller";
 
 const router = Router();
-const authController = new AuthController();
 
 /**
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Iniciar sesión de usuario
- *     description: |
- *       Valida el correo y la contraseña ingresados. La contraseña enviada por el cliente
- *       se compara con el hash almacenado en la base de datos usando bcrypt.compare().
- *       Si coincide, se autentica al usuario.
+ *     summary: Iniciar sesión de usuario con Access Token (15m) y Refresh Token (7d)
  *     tags: 
  *       - Autenticación
  *     requestBody:
@@ -34,30 +28,70 @@ const authController = new AuthController();
  *                 example: "Password123!"
  *     responses:
  *       200:
- *         description: Inicio de sesión exitoso
- *         content:
- *           application/json:
- *             example:
- *               message: "¡Login exitoso!"
- *               datos:
- *                 id: 1
- *                 name: "Ana García"
- *                 email: "ana@example.com"
- *       400:
- *         description: Faltan datos o request inválido
+ *         description: Inicio de sesión exitoso con tokens JWT
  *       401:
  *         description: Credenciales inválidas
- *       500:
- *         description: Error interno del servidor
+ *       403:
+ *         description: Cuenta no activada / correo no verificado
+ *       423:
+ *         description: Cuenta bloqueada temporalmente tras 5 intentos fallidos
  */
-router.post('/login', loginUser);
+router.post("/login", login);
 
 /**
  * @swagger
- * /api/auth/reset-password:
+ * /api/auth/refresh:
  *   post:
- *     summary: Restablecer la contraseña usando un token enviado por correo
- *     tags: [Autenticación]
+ *     summary: Refrescar token de acceso mediante Refresh Token
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Nuevo Access Token y Refresh Token generado
+ *       401:
+ *         description: Refresh Token inválido o expirado
+ */
+router.post("/refresh", refresh);
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Cerrar sesión e invalidar Refresh Token
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada correctamente
+ */
+router.post("/logout", logout);
+
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Solicitar restablecimiento de contraseña
+ *     tags:
+ *       - Autenticación
  *     requestBody:
  *       required: true
  *       content:
@@ -66,29 +100,45 @@ router.post('/login', loginUser);
  *             type: object
  *             required:
  *               - email
- *               - token
- *               - newPassword
  *             properties:
  *               email:
  *                 type: string
- *                 example: "usuario@correo.com"
- *               token:
- *                 type: string
- *                 example: "123456"
- *               newPassword:
- *                 type: string
- *                 example: "NuevaPass123!"
+ *                 example: "user@example.com"
  *     responses:
  *       200:
- *         description: Contraseña actualizada correctamente
- *       400:
- *         description: Falta información, token inválido o contraseña inválida
- *       404:
- *         description: Usuario no encontrado
- *       500:
- *         description: Error interno del servidor
+ *         description: Correo de restablecimiento enviado
  */
-router.post('/reset-password', authController.handleResetPassword);
+router.post("/forgot-password", forgotPassword);
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Restablecer contraseña con token de recuperación
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               token:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *                 example: "NuevaPassword123!"
+ *     responses:
+ *       200:
+ *         description: Contraseña restablecida exitosamente
+ *       400:
+ *         description: Token inválido o contraseña débil
+ */
+router.post("/reset-password", resetPassword);
 
 export default router;
 

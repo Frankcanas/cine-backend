@@ -20,7 +20,7 @@ export class AuthService implements IAuthService {
     }
 
     const token = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas (HU-006)
     const existingToken = await this.tokenRepository.findLatestTokenByUserId(userId);
 
     if (existingToken) {
@@ -53,6 +53,10 @@ export class AuthService implements IAuthService {
     await this.tokenRepository.deleteToken(userId, token);
     await this.verifiedUserRepository.createVerified({ userId, token, verifiedAt: new Date() });
 
-    return { success: true, message: 'Token validado con éxito.' };
+    // Activar usuario en el modelo User
+    const User = (await import("../models/user.model")).default;
+    await User.update({ isVerified: true, isActive: true }, { where: { id: userId } });
+
+    return { success: true, message: 'Token validado con éxito. Cuenta activada.' };
   }
 }

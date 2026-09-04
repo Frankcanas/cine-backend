@@ -44,4 +44,36 @@ router.get("/countries", controller.getCountries.bind(controller));
  */
 router.get("/countries/:countryId/cities", controller.getCitiesByCountry.bind(controller));
 
+/**
+ * @swagger
+ * /api/locations/users/location:
+ *   post:
+ *     summary: Establecer la ubicación preferida de un usuario
+ *     tags: [Locations]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - city
+ *             properties:
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *               city:
+ *                 type: string
+ *                 example: Medellín
+ *     responses:
+ *       200:
+ *         description: Ubicación actualizada correctamente
+ *       400:
+ *         description: Parámetros inválidos
+ *       404:
+ *         description: Usuario no encontrado
+ */
+router.post("/users/location", controller.setUserLocation.bind(controller));
+
 export default router;

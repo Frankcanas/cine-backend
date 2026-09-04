@@ -88,7 +88,57 @@ export class TMDBService {
       throw new Error(`Error al obtener detalle de TMDB ID ${tmdbId}: ${response.statusText}`);
     }
     const data = (await response.json()) as TMDBMovieDetails;
-    return TMDBMovieMapper.toDomainDetail(data);
+    const mapped = TMDBMovieMapper.toDomainDetail(data);
+
+    // Fetch credits & videos in parallel
+    try {
+      const [credits, videos] = await Promise.all([
+        this.getMovieCredits(tmdbId),
+        this.getMovieVideos(tmdbId),
+      ]);
+
+      const director = credits.crew?.find((c) => c.job === "Director")?.name;
+      const cast = credits.cast?.slice(0, 8).map((c) => c.name) || [];
+      const trailer = videos.find((v) => v.site === "YouTube" && v.type === "Trailer");
+      const trailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : undefined;
+
+      mapped.director = director;
+      mapped.cast = cast;
+      if (trailerUrl) mapped.trailerUrl = trailerUrl;
+    } catch {
+      // Non-blocking if credits/videos fail
+    }
+
+    return mapped;
+  }
+
+  async getMovieCredits(tmdbId: number): Promise<{ cast: any[]; crew: any[] }> {
+    const url = this.buildUrl(`/movie/${tmdbId}/credits`);
+    const response = await fetch(url, { headers: this.headers });
+    if (!response.ok) {
+      return { cast: [], crew: [] };
+    }
+    return (await response.json()) as any;
+  }
+
+  async getMovieVideos(tmdbId: number): Promise<any[]> {
+    const url = this.buildUrl(`/movie/${tmdbId}/videos`);
+    const response = await fetch(url, { headers: this.headers });
+    if (!response.ok) {
+      return [];
+    }
+    const data = (await response.json()) as any;
+    return data.results || [];
+  }
+
+  async getMovieRecommendations(tmdbId: number, page = 1, language = "es-ES"): Promise<MappedMovie[]> {
+    const url = this.buildUrl(`/movie/${tmdbId}/recommendations`, { page, language });
+    const response = await fetch(url, { headers: this.headers });
+    if (!response.ok) {
+      return [];
+    }
+    const data = (await response.json()) as TMDBResponse<TMDBMovie>;
+    return (data.results || []).map((movie) => TMDBMovieMapper.toDomain(movie));
   }
 
   async getGenres(language = "es-ES"): Promise<{ id: number; name: string }[]> {

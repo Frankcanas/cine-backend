@@ -10,5 +10,7 @@ export interface IShowtimeRepository {
   findByRoomId(roomId: number): Promise<Showtime[]>;
   update(id: number, showtimeData: Partial<ShowtimeCreationAttributes>): Promise<[number]>;
   delete(id: number): Promise<number>;
-  findByMovieWithFilters(movieId: number, filters:ShowtimeFilterDto ): Promise<Showtime[]>;
+  findByMovieWithFilters(movieId: number, filters:ShowtimeFilterDto ): Promise<any[]>;
+  findByMovieWithFiltersPaginated(movieId: number, filters:ShowtimeFilterDto ): Promise<{ data: any[]; total: number; page: number; totalPages: number }>;
+  findByIdWithAvailability(id: number): Promise<any | null>;
 }

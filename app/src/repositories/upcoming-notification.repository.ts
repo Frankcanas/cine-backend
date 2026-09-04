@@ -28,6 +28,12 @@ export class UpcomingNotificationRepository {
     });
   }
 
+  async findByUserAndMovie(userId: number, movieId: number): Promise<UpcomingNotification | null> {
+    return await UpcomingNotification.findOne({
+      where: { userId, movieId },
+    });
+  }
+
   async update(id: number, data: Partial<UpcomingNotificationCreationAttributes>): Promise<[number]> {
     return await UpcomingNotification.update(data, { where: { id } });
   }

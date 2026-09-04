@@ -11,8 +11,9 @@ export interface SeatAttributes {
   roomId: number;
   row: string;
   column: number;
-  type: string;
+  type: string; // STANDARD | PREFERENTIAL | VIP
   status: string;
+  isEnabled?: boolean;
 }
 
 @Table({
@@ -63,6 +64,14 @@ export class Seat extends Model {
     defaultValue: "AVAILABLE",
   })
   status!: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+    field: "is_enabled",
+  })
+  isEnabled!: boolean;
 
   @HasMany(() => SeatLock)
   seatLocks?: SeatLock[];

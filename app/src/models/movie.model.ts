@@ -23,6 +23,8 @@ export interface MovieAttributes {
   originalLanguage?: string;
   classification?: string;
   trailerUrl?: string;
+  director?: string;
+  cast?: string;
   status?: string;
   isActive?: boolean;
 }
@@ -125,6 +127,18 @@ export class Movie extends Model {
     allowNull: true,
   })
   trailerUrl?: string;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  director?: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  cast?: string;
 
   @Column({
     type: DataType.STRING(50),

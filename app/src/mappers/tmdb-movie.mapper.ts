@@ -18,6 +18,9 @@ export interface MappedMovie {
   originalLanguage?: string;
   genreIds?: number[];
   genres?: { id: number; name: string }[];
+  director?: string;
+  cast?: string[];
+  trailerUrl?: string;
 }
 
 /**

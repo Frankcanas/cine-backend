@@ -100,5 +100,6 @@ router.post('/request-token', authController.handleRequestToken);
  *         description: Error interno al verificar el token.
  */
 router.post('/verify-token', authController.handleVerifyToken);
+router.post('/verify', authController.handleVerifyToken);
 
 export default router;

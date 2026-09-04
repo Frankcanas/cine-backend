@@ -3,6 +3,7 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import Cinema from "./cinema.model";
 import Showtime from "./showtime.model";
+import Seat from "./seat.model";
 
 export interface RoomAttributes {
   id: number;
@@ -20,6 +21,7 @@ export interface RoomAttributes {
 @Table({
   tableName: "rooms",
   timestamps: true,
+  indexes: [{ fields: ["cinemaId"], name: "idx_rooms_cinema" }],
 })
 export class Room extends Model {
   @Column({
@@ -91,6 +93,9 @@ export class Room extends Model {
 
   @HasMany(() => Showtime)
   showtimes?: Showtime[];
+
+  @HasMany(() => Seat)
+  seats?: Seat[];
 }
 
 export type RoomCreationAttributes = Partial<RoomAttributes>;

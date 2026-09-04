@@ -12,11 +12,24 @@ export interface SeatLockAttributes {
   userId: number;
   status: string;
   expiresAt: Date;
+  releasedAt?: Date | null;
 }
 
 @Table({
   tableName: "seat_locks",
   timestamps: true,
+  indexes: [
+    {
+      fields: ["showtime_id", "seat_id", "expires_at"],
+      name: "idx_seat_locks_showtime_seat_expires",
+    },
+    {
+      unique: true,
+      fields: ["showtime_id", "seat_id"],
+      where: { status: "LOCKED" } as any,
+      name: "uniq_active_lock",
+    },
+  ],
 })
 export class SeatLock extends Model {
   @Column({
@@ -72,6 +85,13 @@ export class SeatLock extends Model {
     field: "expires_at",
   })
   expiresAt!: Date;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    field: "released_at",
+  })
+  releasedAt?: Date | null;
 }
 
 export type SeatLockCreationAttributes = Partial<SeatLockAttributes>;

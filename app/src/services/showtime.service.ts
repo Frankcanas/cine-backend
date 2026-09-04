@@ -31,6 +31,10 @@ export class ShowtimeService {
     return await this.showtimeRepository.findById(id);
   }
 
+  async getShowtimeDetail(id: number): Promise<any | null> {
+    return await (this.showtimeRepository as any).findByIdWithAvailability(id);
+  }
+
   async getShowtimesByMovie(movieId: number): Promise<Showtime[]> {
     return await this.showtimeRepository.findByMovieId(movieId);
   }
@@ -55,7 +59,66 @@ export class ShowtimeService {
     const affected = await this.showtimeRepository.delete(id);
     return affected > 0;
   }
-  async getShowtimesForMovie(movieId: number, filters: ShowtimeFilterDto): Promise<Showtime[]> {
-  return await this.showtimeRepository.findByMovieWithFilters(movieId, filters);
+  async getShowtimesForMovie(movieId: number, filters: ShowtimeFilterDto): Promise<any[]> {
+    return await this.showtimeRepository.findByMovieWithFilters(movieId, filters);
+  }
+
+  async getShowtimesForMoviePaginated(
+    movieId: number,
+    filters: ShowtimeFilterDto
+  ): Promise<{ data: any[]; total: number; page: number; totalPages: number }> {
+    return await this.showtimeRepository.findByMovieWithFiltersPaginated(movieId, filters);
+  }
+
+  async getShowtimePrices(showtimeId: number, membershipLevel: number = 1): Promise<any> {
+    const showtime = await this.showtimeRepository.findById(showtimeId);
+    if (!showtime) {
+      const error: any = new Error("Función no encontrada");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const basePrice = Number(showtime.price) || 15000;
+    const format = (showtime.format || "2D").toUpperCase();
+    const roomType = ((showtime as any).room?.type || "STANDARD").toUpperCase();
+
+    // Recargo por formato
+    let formatMultiplier = 1.0;
+    if (format === "3D") formatMultiplier = 1.3;
+    if (format === "IMAX") formatMultiplier = 1.6;
+
+    // Recargo por tipo de sala
+    let roomMultiplier = 1.0;
+    if (roomType === "VIP") roomMultiplier = 1.5;
+    if (roomType === "4DX") roomMultiplier = 1.75;
+
+    const standardPrice = Math.round(basePrice * formatMultiplier * roomMultiplier);
+    const childPrice = Math.round(standardPrice * 0.75); // 25% descuento niños
+    const seniorPrice = Math.round(standardPrice * 0.70); // 30% descuento adulto mayor
+
+    // Descuento por membresía
+    let memberDiscountPct = 5;
+    if (membershipLevel >= 3) memberDiscountPct = 25;
+    else if (membershipLevel === 2) memberDiscountPct = 15;
+
+    const memberPrice = Math.round(standardPrice * (1 - memberDiscountPct / 100));
+
+    return {
+      showtimeId,
+      basePrice,
+      format,
+      roomType,
+      rates: {
+        general: standardPrice,
+        child: childPrice,
+        senior: seniorPrice,
+        member: memberPrice,
+      },
+      discounts: {
+        memberDiscountPercentage: memberDiscountPct,
+        childDiscountPercentage: 25,
+        seniorDiscountPercentage: 30,
+      },
+    };
   }
 }

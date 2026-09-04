@@ -152,6 +152,26 @@ export const getMovieById = async (req: Request, res: Response): Promise<Respons
   }
 };
 
+export const getMovieFunctions = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+    const functions = await movieService.getMovieFunctions(id);
+    return res.status(200).json(functions);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const getMovieRecommendations = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+    const recommendations = await movieService.getMovieRecommendations(id);
+    return res.status(200).json(recommendations);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 export const createMovie = async (req: Request, res: Response): Promise<Response> => {
   try {
     const movie = await movieService.createMovie(req.body);

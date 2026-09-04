@@ -36,8 +36,6 @@ export class EmailService implements IEmailService {
         <p>¡Bienvenido(a) a Riwi Cine!</p>
         <p>Tu cuenta ha sido creada correctamente.</p>
         <p>Ahora puedes iniciar sesión y disfrutar de todas nuestras funciones.</p>
-<<<<<<< HEAD
-=======
       `,
     };
 
@@ -54,7 +52,24 @@ export class EmailService implements IEmailService {
         <p>Recuperación de contraseña</p>
         <p>Tu token para recuperar la contraseña es: <b>${token}</b>.</p>
         <p>Expira en 15 minutos.</p>
->>>>>>> 5a547e5 (Se agrego metodo para enviar correo de recuperacion de contraseña)
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
+
+  async marketingEmails(to: string, user: string, membership: string, membershipBenefits: string): Promise<void> {
+    const mailOptions = {
+      from: `"Riwi-Cine" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `Conoce los beneficios de nuestra membresía ${membership}`,
+      text: `Hola ${user}, ¿ya conocías los beneficios de nuestra membresía ${membership}?`,
+      html: `
+        <div>
+          <p>Hola <strong>${user}</strong>,</p>
+          <p>¿Ya conocías los beneficios de nuestra membresía <strong>${membership}</strong>?</p>
+          <p>${membershipBenefits}</p>
+        </div>
       `,
     };
 

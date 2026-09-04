@@ -1,24 +1,23 @@
-// app/src/models/seat-lock.model.ts
+// app/src/models/cart-ticket.model.ts
 
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
-import Showtime from "./showtime.model";
+import Cart from "./cart.model";
 import Seat from "./seat.model";
-import User from "./user.model";
+import Showtime from "./showtime.model";
 
-export interface SeatLockAttributes {
+export interface CartTicketAttributes {
   id: number;
-  showtimeId: number;
+  cartId: number;
   seatId: number;
-  userId: number;
-  status: string;
-  expiresAt: Date;
+  showtimeId?: number;
+  price?: number;
 }
 
 @Table({
-  tableName: "seat_locks",
+  tableName: "cart_tickets",
   timestamps: true,
 })
-export class SeatLock extends Model {
+export class CartTicket extends Model {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
@@ -26,16 +25,16 @@ export class SeatLock extends Model {
   })
   id!: number;
 
-  @ForeignKey(() => Showtime)
+  @ForeignKey(() => Cart)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    field: "showtime_id",
+    field: "cart_id",
   })
-  showtimeId!: number;
+  cartId!: number;
 
-  @BelongsTo(() => Showtime)
-  showtime?: Showtime;
+  @BelongsTo(() => Cart)
+  cart?: Cart;
 
   @ForeignKey(() => Seat)
   @Column({
@@ -48,32 +47,25 @@ export class SeatLock extends Model {
   @BelongsTo(() => Seat)
   seat?: Seat;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Showtime)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    field: "user_id",
+    allowNull: true,
+    field: "showtime_id",
   })
-  userId!: number;
+  showtimeId?: number;
 
-  @BelongsTo(() => User)
-  user?: User;
-
-  @Column({
-    type: DataType.STRING(30),
-    allowNull: false,
-    defaultValue: "LOCKED",
-  })
-  status!: string;
+  @BelongsTo(() => Showtime)
+  showtime?: Showtime;
 
   @Column({
-    type: DataType.DATE,
-    allowNull: false,
-    field: "expires_at",
+    type: DataType.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: 0,
   })
-  expiresAt!: Date;
+  price?: number;
 }
 
-export type SeatLockCreationAttributes = Partial<SeatLockAttributes>;
+export type CartTicketCreationAttributes = Partial<CartTicketAttributes>;
 
-export default SeatLock;
+export default CartTicket;

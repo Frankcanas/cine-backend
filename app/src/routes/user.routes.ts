@@ -13,7 +13,7 @@
  */
 
 import { Router } from "express";
-import { createUser, getUsers, getProfile } from "../controllers/user.controller";
+import { createUser, getUsers, getProfile, updateProfile } from "../controllers/user.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 
 const router = Router();
@@ -50,6 +50,7 @@ const router = Router();
  *               - phoneNumber
  *               - password
  *               - city
+ *               - notificationPreference
  *              
  *             properties:
  *               name:
@@ -67,6 +68,10 @@ const router = Router();
  *               city:   
  *                type: string
  *                example: "New York"
+ *               notificationPreference:
+ *                 type: boolean
+ *                 description: "Indica si el usuario acepta recibir notificaciones comerciales por correo."
+ *                 example: true
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
@@ -79,6 +84,7 @@ const router = Router();
  *               phoneNumber: "123456789"
  *               password: "*****"
  *               city: "New York"
+ *               notificationPreference: true
  *       400:
  *         description: Datos inválidos
  *         content:
@@ -147,11 +153,11 @@ router.get("/", getUsers);
  * Requiere el header `Authorization: Bearer <token>` con un JWT válido
  * obtenido en `POST /api/auth/login`.
  *
- *
+ /**
  * @swagger
- * /api/users/profile/{id}:
+ * /api/users/profile:
  *   get:
- *     summary: Obtener el perfil de un usuario por ID
+ *     summary: Obtener el perfil del usuario autenticado
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -166,6 +172,7 @@ router.get("/", getUsers);
  *               email: "john.doe@example.com"
  *               phoneNumber: "123456789"
  *               city: "New York"
+ *               notificationPreference: true
  *               membership:
  *                 active: true
  *                 level: "Gold"
@@ -180,9 +187,50 @@ router.get("/", getUsers);
  *       500:
  *         description: Error interno del servidor
  */
+router.get("/profile", authenticateJWT, getProfile);
+router.put("/profile", authenticateJWT, updateProfile);
 
-router.get("/profile/:id", authenticateJWT, getProfile);
+/**
+ * @swagger
+ * /api/users/profile/{id}:
+ *   get:
+ *     summary: Obtener el perfil de un usuario por ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Perfil obtenido exitosamente
+ *   put:
+ *     summary: Actualizar perfil de un usuario por ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Perfil actualizado correctamente
+ */
+router.get("/profile/:id", getProfile);
+router.put("/profile/:id", updateProfile);
 
 export default router;
-
-

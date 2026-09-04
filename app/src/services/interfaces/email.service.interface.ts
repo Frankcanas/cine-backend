@@ -1,7 +1,7 @@
 /**
  * Opciones requeridas para estructurar un correo.
  */
-export interface SendEmailDto {
+export interface SendEmailDto{
     to: string;
     subject: string;
     html: string;
@@ -15,4 +15,5 @@ export interface IEmailService {
     sendVerificationEmail(to: string, token: string): Promise<void>;
     sendUserCreationEmail(to: string): Promise<void>;
     passwordRecoveryEmail(to: string, token: string): Promise<void>;
+    marketingEmails(to: string, user:string, membership: string, membershipBenefits: string): Promise <void>;
 }
