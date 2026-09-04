@@ -204,6 +204,28 @@ export class MovieRepository implements IMovieRepository {
     });
   }
 
+  async findFunctionsByMovieId(movieId: number): Promise<Showtime[]> {
+    return await Showtime.findAll({
+      where: {
+        movieId,
+        startTime: { [Op.gte]: new Date() },
+        status: "AVAILABLE",
+      },
+      include: [
+        {
+          model: Room,
+          include: [
+            {
+              model: Cinema,
+              include: [{ model: City, as: "cityObj" }],
+            },
+          ],
+        },
+      ],
+      order: [["startTime", "ASC"]],
+    });
+  }
+
   async update(id: number, movieData: Partial<MovieCreationAttributes>): Promise<[number]> {
     return await Movie.update(movieData, { where: { id } });
   }

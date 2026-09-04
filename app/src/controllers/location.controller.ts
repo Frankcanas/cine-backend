@@ -1,32 +1,51 @@
-// FCB - Archivo creado
 // app/src/controllers/location.controller.ts
 
 import { Request, Response } from "express";
-import Country from "../models/country.model";
-import City from "../models/city.model";
+import { LocationService } from "../services/location.service";
 
 export class LocationController {
-  async getCountries(req: Request, res: Response): Promise<void> {
+  private locationService: LocationService;
+
+  constructor() {
+    this.locationService = new LocationService();
+  }
+
+  getCountries = async (req: Request, res: Response): Promise<void> => {
     try {
-      const countries = await Country.findAll({ order: [["name", "ASC"]] });
+      const countries = await this.locationService.getCountries();
       res.status(200).json(countries);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Error interno al obtener países" });
     }
-  }
+  };
 
-  async getCitiesByCountry(req: Request, res: Response): Promise<void> {
+  getCitiesByCountry = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { countryId } = req.params;
-      const cities = await City.findAll({
-        where: { countryId },
-        order: [["name", "ASC"]],
-      });
+      const countryId = Number(req.params.countryId);
+      const cities = await this.locationService.getCitiesByCountry(countryId);
       res.status(200).json(cities);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Error interno al obtener ciudades" });
     }
-  }
+  };
+
+  setUserLocation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = Number((req as any).userId || req.body.userId);
+      const { city } = req.body;
+
+      if (!userId || !city) {
+        res.status(400).json({ error: "userId y city son requeridos" });
+        return;
+      }
+
+      const result = await this.locationService.setUserLocation(userId, city);
+      res.status(200).json(result);
+    } catch (error: any) {
+      const status = error.statusCode || 500;
+      res.status(status).json({ error: error.message });
+    }
+  };
 }

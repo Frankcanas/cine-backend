@@ -13,4 +13,4 @@ RUN npm install --include=dev
 EXPOSE 3000
 
 # Comando por defecto
-CMD ["sh", "-c", "if [ ! -d node_modules ]; then npm install --include=dev; fi && npx ts-node-dev --respawn --transpile-only src/index.ts"]
+CMD ["sh", "-c", "npm install --include=dev && npx ts-node-dev --respawn --transpile-only src/index.ts"]

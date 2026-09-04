@@ -2,6 +2,7 @@
 
 import User from "../../models/user.model";
 import { CreateUserDto } from "../../dto/create-user.dto";
+import { UserProfileDto } from "../../dto/user-profile.dto";
 
 /**
  * Contrato del Servicio de Usuarios.
@@ -13,4 +14,7 @@ export interface IUserService {
 
     findAll(): Promise<User[]>;
 
+    findById(id: number): Promise<User | null>;
+
+    getProfile(userId: number): Promise<UserProfileDto | null>;
 }

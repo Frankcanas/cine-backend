@@ -33,6 +33,13 @@ export default class City extends Model {
   @BelongsTo(() => Country)
   country!: Country;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  isActive!: boolean;
+
   @HasMany(() => Cinema)
   cinemas!: Cinema[];
 }

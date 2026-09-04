@@ -12,6 +12,8 @@ dotenv.config();
 
 import app from "./server";
 import sequelize from "./config/database";
+import { Op } from "sequelize";
+import SeatLock from "./models/seat-lock.model";
 
 const PORT = process.env.APP_PORT || 3000;
 
@@ -24,7 +26,17 @@ const start = async () => {
       {
          alter: true,
       }
-    ); // crea tablas si no existen
+    );
+
+    // Limpieza periódica de bloqueos expirados (HU-010 P0-5): cada 60s borra SeatLock con expiresAt <= now().
+    // En producción se recomienda evolucionar a node-cron, pg_cron o BullMQ+Redis.
+    setInterval(async () => {
+      try {
+        await SeatLock.destroy({ where: { expiresAt: { [Op.lte]: new Date() } } });
+      } catch (e) {
+        console.error("[seat-lock-cleanup] Error:", e);
+      }
+    }, 60_000).unref?.();
 
     app.listen(PORT, () => {
       console.log(`Servidor escuchando en puerto ${PORT}`);

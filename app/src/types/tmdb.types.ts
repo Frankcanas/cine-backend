@@ -43,3 +43,37 @@ export interface TMDBMovieDetails extends TMDBMovie {
   status: string;
   tagline: string;
 }
+
+export interface TMDBCastMember {
+  id: number;
+  name: string;
+  character: string;
+  order: number;
+}
+
+export interface TMDBCrewMember {
+  id: number;
+  name: string;
+  job: string;
+  department: string;
+}
+
+export interface TMDBCreditsResponse {
+  id: number;
+  cast: TMDBCastMember[];
+  crew: TMDBCrewMember[];
+}
+
+export interface TMDBVideo {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+}
+
+export interface TMDBVideosResponse {
+  id: number;
+  results: TMDBVideo[];
+}

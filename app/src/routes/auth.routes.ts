@@ -1,6 +1,5 @@
-import { Router, Request, Response } from 'express';
-import User from '../models/user.model';
-import { comparePassword } from '../utils/password';
+import { Router } from "express";
+import { login, refresh, logout, forgotPassword, resetPassword } from "../controllers/auth.controller";
 
 const router = Router();
 
@@ -8,11 +7,7 @@ const router = Router();
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Iniciar sesión de usuario
- *     description: |
- *       Valida el correo y la contraseña ingresados. La contraseña enviada por el cliente
- *       se compara con el hash almacenado en la base de datos usando bcrypt.compare().
- *       Si coincide, se autentica al usuario.
+ *     summary: Iniciar sesión de usuario con Access Token (15m) y Refresh Token (7d)
  *     tags: 
  *       - Autenticación
  *     requestBody:
@@ -33,56 +28,117 @@ const router = Router();
  *                 example: "Password123!"
  *     responses:
  *       200:
- *         description: Inicio de sesión exitoso
- *         content:
- *           application/json:
- *             example:
- *               message: "¡Login exitoso!"
- *               datos:
- *                 id: 1
- *                 name: "Ana García"
- *                 email: "ana@example.com"
- *       400:
- *         description: Faltan datos o request inválido
+ *         description: Inicio de sesión exitoso con tokens JWT
  *       401:
  *         description: Credenciales inválidas
- *       500:
- *         description: Error interno del servidor
+ *       403:
+ *         description: Cuenta no activada / correo no verificado
+ *       423:
+ *         description: Cuenta bloqueada temporalmente tras 5 intentos fallidos
  */
+router.post("/login", login);
 
-router.post('/login', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refrescar token de acceso mediante Refresh Token
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Nuevo Access Token y Refresh Token generado
+ *       401:
+ *         description: Refresh Token inválido o expirado
+ */
+router.post("/refresh", refresh);
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Correo y contraseña son requeridos' });
-    }
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Cerrar sesión e invalidar Refresh Token
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada correctamente
+ */
+router.post("/logout", logout);
 
-    try {
-        const user = await User.findOne({ where: { email: email } });
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Solicitar restablecimiento de contraseña
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: Correo de restablecimiento enviado
+ */
+router.post("/forgot-password", forgotPassword);
 
-        if (!user) {
-            return res.status(401).json({ message: 'Credenciales inválidas (usuario no encontrado)' });
-        }
-
-        const passwordMatches = await comparePassword(password, user.password);
-
-        if (!passwordMatches) {
-            return res.status(401).json({ message: 'Credenciales inválidas (contraseña incorrecta)' });
-        }
-
-        return res.status(200).json({
-            message: '¡Login exitoso!',
-            datos: { 
-                id: user.id,
-                name: user.name,
-                email: user.email
-            }
-        });
-
-    } catch (error) {
-        return res.status(500).json({ message: 'Error interno del servidor', error });
-    }
-});
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Restablecer contraseña con token de recuperación
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               token:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *                 example: "NuevaPassword123!"
+ *     responses:
+ *       200:
+ *         description: Contraseña restablecida exitosamente
+ *       400:
+ *         description: Token inválido o contraseña débil
+ */
+router.post("/reset-password", resetPassword);
 
 export default router;
 

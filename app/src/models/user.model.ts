@@ -14,7 +14,18 @@ export interface UserAttributes {
   phoneNumber: string;
   password: string;
   city?: string;
+  notificationPreference?: boolean;
   membershipId?: number;
+  points?: number;
+  membershipStartDate?: Date;
+  membershipCode?: string;
+  isActive?: boolean;
+  isVerified?: boolean;
+  failedLoginAttempts?: number;
+  lockoutUntil?: Date | null;
+  refreshToken?: string | null;
+  resetPasswordToken?: string | null;
+  resetPasswordExpires?: Date | null;
 }
 
 /**
@@ -67,6 +78,13 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   })
   city?: string;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  notificationPreference!: boolean;
+
   @ForeignKey(() => Membership)
   @Column({
     type: DataType.INTEGER,
@@ -77,9 +95,73 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   @BelongsTo(() => Membership)
   membership?: Membership;
 
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  points!: number;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  membershipStartDate?: Date;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+    unique: true,
+  })
+  membershipCode?: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isActive!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isVerified!: boolean;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  failedLoginAttempts!: number;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  lockoutUntil?: Date | null;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  refreshToken?: string | null;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  resetPasswordToken?: string | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  resetPasswordExpires?: Date | null;
+
   @HasMany(() => UpcomingNotification)
   notifications?: UpcomingNotification[];
 }
-
 
 export default User;

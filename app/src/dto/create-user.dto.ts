@@ -58,12 +58,22 @@ export interface CreateUserDto {
      */
     phoneNumber: string;
 
-        /**
-     * contraseña del usuario.
-     */
+    /**
+ * contraseña del usuario.
+ */
     password: string;
 
     city: string;
+
+    /**
+     * Indica si el usuario acepta recibir notificaciones comerciales por correo.
+     */
+    notificationPreference?: boolean;
+
+    /**
+     * Alias compatible para el frontend en español.
+     */
+    preferenciaNotificaciones?: boolean;
 
     passwordStatus?: PasswordValidationDto;
 }

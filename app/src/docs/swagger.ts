@@ -25,6 +25,15 @@ const options: swaggerJSDoc.Options = {
         description: "Servidor IP local (127.0.0.1:3000)",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: [
     path.join(__dirname, "../routes/*.ts").replace(/\\/g, "/"),

@@ -12,6 +12,13 @@ export class UpcomingNotificationService {
   }
 
   async create(dto: CreateUpcomingNotificationDto): Promise<UpcomingNotification> {
+    const existing = await this.repository.findByUserAndMovie(dto.userId, dto.movieId);
+    if (existing) {
+      const error: any = new Error("Ya existe una notificación configurada para este usuario y película");
+      error.statusCode = 409;
+      throw error;
+    }
+
     const payload: UpcomingNotificationCreationAttributes = {
       userId: dto.userId,
       movieId: dto.movieId,
