@@ -14,6 +14,36 @@ export interface MembershipStatusDto {
   membershipName: string | null;
   benefits: string | null;
   expiresAt: Date | null;
+  membershipCode: string | null;
+  qrCode: string | null;
+  qrCodeDataUrl: string | null;
+  discountPercentage: number;
+}
+
+export interface BonusDto {
+  id: number;
+  code: string;
+  amount: number;
+  balance: number;
+  description?: string;
+  isUsed: boolean;
+  expiresAt?: Date | null;
+}
+
+export interface OrderHistoryDto {
+  id: number;
+  total: number;
+  status: string;
+  paymentMethod: string;
+  createdAt: Date;
+}
+
+export interface ReservationDto {
+  id: number;
+  showtimeId: number;
+  seatId: number;
+  status: string;
+  expiresAt: Date;
 }
 
 export interface UserProfileDto {
@@ -22,6 +52,11 @@ export interface UserProfileDto {
   email: string;
   phoneNumber: string;
   city?: string;
+  photoUrl?: string | null;
   notificationPreference: boolean;
   membership: MembershipStatusDto;
+  bonos: BonusDto[];
+  historialCompras: OrderHistoryDto[];
+  historialPuntos: number;
+  reservasActivas: ReservationDto[];
 }

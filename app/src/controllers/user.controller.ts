@@ -235,12 +235,17 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
 
         const json = updated.toJSON ? updated.toJSON() : { ...updated };
         delete (json as any).password;
-
+        // si hubo cambio de email, isVerified cambia
+        const emailChanged = req.body.email && req.body.email !== json.email;
+        // actually json.email ya es nuevo, comparar con request
+        const msg = req.body.email ? "Perfil actualizado. Si cambiaste el email, revisa tu correo para re-validar (RN-034)." : "Perfil actualizado correctamente";
         return res.status(200).json({
-            message: "Perfil actualizado correctamente",
+            message: msg,
             user: json,
         });
     } catch (error: any) {
+        if (error.statusCode === 409) return res.status(409).json({ error: error.message });
+        if (error.statusCode === 400) return res.status(400).json({ error: error.message });
         return res.status(500).json({ error: error.message });
     }
 };

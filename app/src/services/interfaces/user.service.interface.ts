@@ -3,6 +3,7 @@
 import User from "../../models/user.model";
 import { CreateUserDto } from "../../dto/create-user.dto";
 import { UserProfileDto } from "../../dto/user-profile.dto";
+import { UpdateProfileDto } from "../../dto/update-profile.dto";
 
 /**
  * Contrato del Servicio de Usuarios.
@@ -17,4 +18,6 @@ export interface IUserService {
     findById(id: number): Promise<User | null>;
 
     getProfile(userId: number): Promise<UserProfileDto | null>;
+
+    updateProfile(userId: number, data: UpdateProfileDto): Promise<User | null>;
 }

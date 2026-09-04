@@ -157,13 +157,13 @@ router.get("/", getUsers);
  * @swagger
  * /api/users/profile:
  *   get:
- *     summary: Obtener el perfil del usuario autenticado
+ *     summary: Obtener el perfil del usuario autenticado (HU-008)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Perfil obtenido exitosamente
+ *         description: Perfil obtenido exitosamente con membresía, QR, bonos, compras y reservas
  *         content:
  *           application/json:
  *             example:
@@ -172,14 +172,23 @@ router.get("/", getUsers);
  *               email: "john.doe@example.com"
  *               phoneNumber: "123456789"
  *               city: "New York"
+ *               photoUrl: "https://cdn.example.com/photos/3.jpg"
  *               notificationPreference: true
  *               membership:
  *                 active: true
- *                 level: "Gold"
+ *                 level: "Oro"
  *                 points: 120
- *                 membershipName: "Premium"
- *                 benefits: "Acceso a estrenos anticipados"
+ *                 membershipName: "Oro"
+ *                 benefits: "15% descuento y prioridad reservas"
  *                 expiresAt: "2026-09-18T00:00:00.000Z"
+ *                 membershipCode: "MEM-A1B2C3-KRJ9"
+ *                 qrCode: "MEM-A1B2C3-KRJ9"
+ *                 qrCodeDataUrl: "data:image/png;base64,iVBORw0KGgo..."
+ *                 discountPercentage: 15
+ *               bonos: [{ id:1, code:"BONO-001", amount:5000, balance:5000, isUsed:false }]
+ *               historialCompras: [{ id:1, total:25000, status:"PAID", paymentMethod:"CARD" }]
+ *               historialPuntos: 120
+ *               reservasActivas: [{ id:1, showtimeId:10, seatId:5, status:"LOCKED" }]
  *       401:
  *         description: Token no proporcionado, inválido o expirado
  *       404:
@@ -188,14 +197,60 @@ router.get("/", getUsers);
  *         description: Error interno del servidor
  */
 router.get("/profile", authenticateJWT, getProfile);
+/**
+ * @swagger
+ * /api/users/profile:
+ *   put:
+ *     summary: Actualizar perfil del usuario autenticado (HU-008 RN-034)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "John Doe"
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "3001234567"
+ *               city:
+ *                 type: string
+ *                 example: "Medellin"
+ *               photoUrl:
+ *                 type: string
+ *                 example: "https://cdn.example.com/photo.jpg"
+ *               notificationPreference:
+ *                 type: boolean
+ *                 example: true
+ *               email:
+ *                 type: string
+ *                 example: "new.email@example.com"
+ *                 description: "Si cambia, requiere re-validación (RN-034)"
+ *     responses:
+ *       200:
+ *         description: Perfil actualizado correctamente
+ *       400:
+ *         description: Email inválido
+ *       401:
+ *         description: No autorizado
+ *       409:
+ *         description: Email ya registrado
+ */
 router.put("/profile", authenticateJWT, updateProfile);
 
 /**
  * @swagger
  * /api/users/profile/{id}:
  *   get:
- *     summary: Obtener el perfil de un usuario por ID
+ *     summary: Obtener el perfil de un usuario por ID (admin/debug)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -206,8 +261,10 @@ router.put("/profile", authenticateJWT, updateProfile);
  *       200:
  *         description: Perfil obtenido exitosamente
  *   put:
- *     summary: Actualizar perfil de un usuario por ID
+ *     summary: Actualizar perfil de un usuario por ID (admin)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -226,11 +283,17 @@ router.put("/profile", authenticateJWT, updateProfile);
  *                 type: string
  *               city:
  *                 type: string
+ *               photoUrl:
+ *                 type: string
+ *               notificationPreference:
+ *                 type: boolean
+ *               email:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Perfil actualizado correctamente
  */
-router.get("/profile/:id", getProfile);
-router.put("/profile/:id", updateProfile);
+router.get("/profile/:id", authenticateJWT, getProfile);
+router.put("/profile/:id", authenticateJWT, updateProfile);
 
 export default router;

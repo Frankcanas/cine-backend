@@ -3,6 +3,7 @@
 import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import Membership from "./membreship.model";
 import UpcomingNotification from "./upcoming-notification.model";
+import Bonus from "./bonus.model";
 
 /**
  * Atributos principales de la entidad `User`.
@@ -14,6 +15,7 @@ export interface UserAttributes {
   phoneNumber: string;
   password: string;
   city?: string;
+  photoUrl?: string;
   notificationPreference?: boolean;
   membershipId?: number;
   points?: number;
@@ -77,6 +79,12 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     allowNull: true,
   })
   city?: string;
+
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+  })
+  photoUrl?: string;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -162,6 +170,9 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   @HasMany(() => UpcomingNotification)
   notifications?: UpcomingNotification[];
+
+  @HasMany(() => Bonus)
+  bonuses?: Bonus[];
 }
 
 export default User;

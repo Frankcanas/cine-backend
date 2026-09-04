@@ -34,6 +34,7 @@ import Order from "../models/order.model";
 // FCB - Modificado: Importación de modelos geográficos (HU-002)
 import Country from "../models/country.model";
 import City from "../models/city.model";
+import Bonus from "../models/bonus.model";
 
 const sequelize = new Sequelize(
   process.env.POSTGRES_DB as string,
@@ -68,6 +69,7 @@ const sequelize = new Sequelize(
       CartTicket,
       CartSnack,
       Order,
+      Bonus,
     ],
   }
 );

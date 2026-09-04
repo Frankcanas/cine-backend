@@ -7,6 +7,9 @@ export interface CreateMembershipDto {
     price: number;
     durationDays: number;
     description: string;
+    level?: string;
+    discountPercentage?: number;
+    pointsPerPurchase?: number;
 
 }
 
