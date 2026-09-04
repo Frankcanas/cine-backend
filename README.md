@@ -205,15 +205,25 @@ docker-compose down
 
 ## 👥 Contributors And Authors
 
-| Author          | Role               | Path |
-| --------------- | ------------------ | ---- |
-| **Riwi Coders** | Backend Developers | Node |
+| Author | Role | Path |
+| --- | --- | --- |
+| **Valery Avila** | Backend Developer | Node |
+| **Manuel Rueda** | Backend Developer | Node |
+| **Frank Cañas** | Backend Developer | Node |
+| **Santiago Valensuela** | Backend Developer | Node |
+| **Santiago Otalora** | Backend Developer | Node |
 
 <div align=right>
 
 [Back to top](#-table-of-contents)
 
 </div>
+
+---
+
+## 🔗 Repositorio
+
+- **GitHub:** [https://github.com/Frankcanas/cine-backend](https://github.com/Frankcanas/cine-backend)
 
 ---
 
